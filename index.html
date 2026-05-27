@@ -123,6 +123,11 @@
                 <input type="range" id="r-bang" min="0" max="10" step="0.5" value="2">
             </div>
             <div class="cfg-row">
+                <div class="cfg-label"><span>颈部跟随头部</span><span class="cfg-val" id="v-ninf">35%</span></div>
+                <input type="range" id="r-ninf" min="0" max="100" step="5" value="35">
+                <div class="cfg-hint">颈部受头部运动影响的比例，0=完全固定，100=完全跟随</div>
+            </div>
+            <div class="cfg-row">
                 <div class="cfg-label"><span>头部旋转中心 X</span><span class="cfg-val" id="v-hpx">640</span></div>
                 <input type="range" id="r-hpx" min="500" max="800" step="5" value="640">
             </div>
@@ -182,7 +187,7 @@
             { name: 'legwear',     filename: 'layers/legwear.png',     group: 'body' },
             { name: 'footwear',    filename: 'layers/footwear.png',    group: 'body' },
             { name: 'topwear',     filename: 'layers/topwear.png',     group: 'body' },
-            { name: 'neck',        filename: 'layers/neck.png',        group: 'body' },
+            { name: 'neck',        filename: 'layers/neck.png',        group: 'neck' },
             { name: 'objects',     filename: 'layers/objects.png',     group: 'prop' },
             { name: 'handwear',    filename: 'layers/handwear.png',    group: 'body' },
             { name: 'ears',        filename: 'layers/ears.png',        group: 'head' },
@@ -228,6 +233,7 @@
             maxPupilMove: 3,
             maxHeadAngle: 6,
             maxBodyAngle: 2,
+            neckHeadInfluence: 0.35,
             headPivotX: 640,
             headPivotY: 330,
             bodyPivotX: 680,
@@ -256,6 +262,7 @@
         bindParam('pupil', 'maxPupilMove');
         bindParam('hang',  'maxHeadAngle',  v => v, '°');
         bindParam('bang',  'maxBodyAngle',  v => v, '°');
+        bindParam('ninf',  'neckHeadInfluence', v => Math.round(v * 100), '%');
         bindParam('hpx',   'headPivotX');
         bindParam('hpy',   'headPivotY');
         bindParam('bpx',   'bodyPivotX');
@@ -366,6 +373,22 @@
                         pivotY: params.bodyPivotY,
                         angle: currentBodyAngle,
                         offX: 0, offY: 0
+                    };
+                }
+
+                case 'neck': {
+                    const inf = params.neckHeadInfluence;
+                    // 颈部旋转 = 身体旋转 + 头部独立旋转 * 影响系数
+                    const neckAngle = currentBodyAngle + currentHeadAngle * inf;
+                    // 头部旋转中心被身体带到的新位置
+                    const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
+                    // 颈部平移 = 身体位移 + 头部独立平移 * 影响系数
+                    return {
+                        pivotX: params.headPivotX + pivotDelta.x,
+                        pivotY: params.headPivotY + pivotDelta.y,
+                        angle: neckAngle,
+                        offX: pivotDelta.x + currentHeadX * inf,
+                        offY: pivotDelta.y + currentHeadY * inf
                     };
                 }
 
