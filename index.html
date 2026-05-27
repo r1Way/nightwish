@@ -21,7 +21,7 @@
         /* 配置面板 */
         #config-panel {
             position: fixed; top: 12px; right: 12px;
-            width: 280px; max-height: calc(100vh - 24px);
+            width: 300px; max-height: calc(100vh - 24px);
             background: rgba(30, 30, 35, 0.92);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.12);
@@ -72,7 +72,12 @@
         }
         .cfg-sep {
             height: 1px; background: rgba(255,255,255,0.08);
-            margin: 12px 0;
+            margin: 10px 0;
+        }
+        .cfg-group-title {
+            font-size: 11px; font-weight: 600; color: #fff;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
         .cfg-check {
             display: flex; align-items: center; gap: 8px; cursor: pointer;
@@ -93,29 +98,60 @@
             <span id="config-toggle">▼</span>
         </div>
         <div id="config-body">
+            <div class="cfg-group-title">平移</div>
             <div class="cfg-row">
-                <div class="cfg-label"><span>头部最大移动</span><span class="cfg-val" id="v-head">12</span></div>
-                <input type="range" id="r-head" min="0" max="30" step="0.5" value="12">
+                <div class="cfg-label"><span>头部最大移动</span><span class="cfg-val" id="v-head">10</span></div>
+                <input type="range" id="r-head" min="0" max="30" step="0.5" value="10">
             </div>
             <div class="cfg-row">
-                <div class="cfg-label"><span>眼睛最大移动</span><span class="cfg-val" id="v-eye">6</span></div>
-                <input type="range" id="r-eye" min="0" max="20" step="0.5" value="6">
+                <div class="cfg-label"><span>眼睛最大移动</span><span class="cfg-val" id="v-eye">5</span></div>
+                <input type="range" id="r-eye" min="0" max="20" step="0.5" value="5">
             </div>
             <div class="cfg-row">
                 <div class="cfg-label"><span>瞳孔额外移动</span><span class="cfg-val" id="v-pupil">3</span></div>
                 <input type="range" id="r-pupil" min="0" max="10" step="0.5" value="3">
-                <div class="cfg-hint">相对眼白的独立微动幅度</div>
             </div>
+
             <div class="cfg-sep"></div>
+            <div class="cfg-group-title">旋转</div>
             <div class="cfg-row">
-                <div class="cfg-label"><span>头部平滑系数</span><span class="cfg-val" id="v-lhead">0.08</span></div>
+                <div class="cfg-label"><span>头部最大旋转</span><span class="cfg-val" id="v-hang">6°</span></div>
+                <input type="range" id="r-hang" min="0" max="15" step="0.5" value="6">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>身体最大旋转</span><span class="cfg-val" id="v-bang">2°</span></div>
+                <input type="range" id="r-bang" min="0" max="10" step="0.5" value="2">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>头部旋转中心 X</span><span class="cfg-val" id="v-hpx">640</span></div>
+                <input type="range" id="r-hpx" min="500" max="800" step="5" value="640">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>头部旋转中心 Y</span><span class="cfg-val" id="v-hpy">330</span></div>
+                <input type="range" id="r-hpy" min="200" max="500" step="5" value="330">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>身体旋转中心 X</span><span class="cfg-val" id="v-bpx">680</span></div>
+                <input type="range" id="r-bpx" min="500" max="900" step="5" value="680">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>身体旋转中心 Y</span><span class="cfg-val" id="v-bpy">600</span></div>
+                <input type="range" id="r-bpy" min="400" max="900" step="5" value="600">
+            </div>
+
+            <div class="cfg-sep"></div>
+            <div class="cfg-group-title">平滑</div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>头部/身体平滑</span><span class="cfg-val" id="v-lhead">0.08</span></div>
                 <input type="range" id="r-lhead" min="0.01" max="0.30" step="0.01" value="0.08">
             </div>
             <div class="cfg-row">
-                <div class="cfg-label"><span>眼睛平滑系数</span><span class="cfg-val" id="v-leye">0.12</span></div>
+                <div class="cfg-label"><span>眼睛平滑</span><span class="cfg-val" id="v-leye">0.12</span></div>
                 <input type="range" id="r-leye" min="0.01" max="0.30" step="0.01" value="0.12">
             </div>
+
             <div class="cfg-sep"></div>
+            <div class="cfg-group-title">限位</div>
             <div class="cfg-row">
                 <div class="cfg-label"><span>瞳孔水平限位</span><span class="cfg-val" id="v-px">5</span></div>
                 <input type="range" id="r-px" min="0" max="10" step="0.5" value="5">
@@ -125,6 +161,7 @@
                 <input type="range" id="r-py" min="0" max="5" step="0.5" value="0">
                 <div class="cfg-hint">建议保持 0，眼白与瞳孔几乎等高</div>
             </div>
+
             <div class="cfg-sep"></div>
             <label class="cfg-check">
                 <input type="checkbox" id="c-debug">
@@ -145,7 +182,7 @@
             { name: 'legwear',     filename: 'layers/legwear.png',     group: 'body' },
             { name: 'footwear',    filename: 'layers/footwear.png',    group: 'body' },
             { name: 'topwear',     filename: 'layers/topwear.png',     group: 'body' },
-            { name: 'objects',     filename: 'layers/objects.png',     group: 'body' },
+            { name: 'objects',     filename: 'layers/objects.png',     group: 'prop' },
             { name: 'handwear',    filename: 'layers/handwear.png',    group: 'body' },
             { name: 'neck',        filename: 'layers/neck.png',        group: 'head' },
             { name: 'ears',        filename: 'layers/ears.png',        group: 'head' },
@@ -184,11 +221,17 @@
         const FACE_CENTER_X = 624;
         const FACE_CENTER_Y = 258;
 
-        // ========== 可调参数（绑定到配置面板） ==========
+        // ========== 可调参数 ==========
         const params = {
-            maxHeadMove: 12,
-            maxEyeMove: 6,
+            maxHeadMove: 10,
+            maxEyeMove: 5,
             maxPupilMove: 3,
+            maxHeadAngle: 6,
+            maxBodyAngle: 2,
+            headPivotX: 640,
+            headPivotY: 330,
+            bodyPivotX: 680,
+            bodyPivotY: 600,
             lerpHead: 0.08,
             lerpEye: 0.12,
             pupilLimitX: 5,
@@ -196,21 +239,29 @@
             debug: false
         };
 
+        const D2R = Math.PI / 180;
+
         // 绑定配置面板
-        function bindParam(id, key, fmt = v => v) {
+        function bindParam(id, key, fmt = v => v, suffix = '') {
             const el = document.getElementById('r-' + id);
             const disp = document.getElementById('v-' + id);
             el.addEventListener('input', () => {
                 const v = parseFloat(el.value);
                 params[key] = v;
-                disp.textContent = fmt(v);
+                disp.textContent = fmt(v) + suffix;
             });
         }
         bindParam('head',  'maxHeadMove');
         bindParam('eye',   'maxEyeMove');
         bindParam('pupil', 'maxPupilMove');
-        bindParam('lhead', 'lerpHead',    v => v.toFixed(2));
-        bindParam('leye',  'lerpEye',     v => v.toFixed(2));
+        bindParam('hang',  'maxHeadAngle',  v => v, '°');
+        bindParam('bang',  'maxBodyAngle',  v => v, '°');
+        bindParam('hpx',   'headPivotX');
+        bindParam('hpy',   'headPivotY');
+        bindParam('bpx',   'bodyPivotX');
+        bindParam('bpy',   'bodyPivotY');
+        bindParam('lhead', 'lerpHead',      v => v.toFixed(2));
+        bindParam('leye',  'lerpEye',       v => v.toFixed(2));
         bindParam('px',    'pupilLimitX');
         bindParam('py',    'pupilLimitY');
 
@@ -218,7 +269,6 @@
             params.debug = e.target.checked;
         });
 
-        // 面板折叠
         const panel = document.getElementById('config-panel');
         document.getElementById('config-header').addEventListener('click', () => {
             panel.classList.toggle('collapsed');
@@ -227,10 +277,20 @@
         // 状态
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
+
+        // 头部平移
         let targetHeadX = 0, targetHeadY = 0;
         let currentHeadX = 0, currentHeadY = 0;
+        // 头部旋转
+        let targetHeadAngle = 0;
+        let currentHeadAngle = 0;
+        // 身体旋转
+        let targetBodyAngle = 0;
+        let currentBodyAngle = 0;
+        // 眼睛平移
         let targetEyeX = 0, targetEyeY = 0;
         let currentEyeX = 0, currentEyeY = 0;
+
         let images = {};
         let loadedCount = 0;
         let allLoaded = false;
@@ -265,8 +325,14 @@
 
         function updateTargets() {
             const off = getMouseOffset();
+            // 头部平移目标
             targetHeadX = off.x * params.maxHeadMove;
             targetHeadY = off.y * params.maxHeadMove;
+            // 头部旋转目标（由水平偏移主导，带一点垂直分量）
+            targetHeadAngle = off.x * params.maxHeadAngle * D2R;
+            // 身体旋转目标（滞后于头部）
+            targetBodyAngle = off.x * params.maxBodyAngle * D2R;
+            // 眼睛平移目标（在头部局部坐标系中）
             targetEyeX  = off.x * params.maxEyeMove;
             targetEyeY  = off.y * params.maxEyeMove;
         }
@@ -274,27 +340,71 @@
         function updateCurrent() {
             currentHeadX = lerp(currentHeadX, targetHeadX, params.lerpHead);
             currentHeadY = lerp(currentHeadY, targetHeadY, params.lerpHead);
+            currentHeadAngle = lerp(currentHeadAngle, targetHeadAngle, params.lerpHead);
+            currentBodyAngle = lerp(currentBodyAngle, targetBodyAngle, params.lerpHead);
             currentEyeX  = lerp(currentEyeX,  targetEyeX,  params.lerpEye);
             currentEyeY  = lerp(currentEyeY,  targetEyeY,  params.lerpEye);
         }
 
-        function getLayerOffset(group) {
+        // 将局部偏移旋转到世界坐标系（用于眼睛/瞳孔的平移）
+        function rotateVector(vx, vy, angle) {
+            const c = Math.cos(angle);
+            const s = Math.sin(angle);
+            return { x: vx * c - vy * s, y: vx * s + vy * c };
+        }
+
+        // 获取某层的绘制变换
+        function getLayerTransform(group) {
             switch (group) {
-                case 'body':  return { x: 0, y: 0 };
-                case 'head':  return { x: currentHeadX, y: currentHeadY };
-                // 眼睛应整体跟随头部，再叠加独立微动
-                case 'eye':   return { x: currentHeadX + currentEyeX, y: currentHeadY + currentEyeY };
+                case 'prop':
+                    return { pivotX: 0, pivotY: 0, angle: 0, offX: 0, offY: 0 };
+                case 'body': {
+                    return {
+                        pivotX: params.bodyPivotX,
+                        pivotY: params.bodyPivotY,
+                        angle: currentBodyAngle,
+                        offX: 0, offY: 0
+                    };
+                }
+                case 'head': {
+                    return {
+                        pivotX: params.headPivotX,
+                        pivotY: params.headPivotY,
+                        angle: currentHeadAngle,
+                        offX: currentHeadX,
+                        offY: currentHeadY
+                    };
+                }
+                case 'eye': {
+                    // 眼睛平移在头部局部坐标系中，需旋转到世界坐标
+                    const eyeLocal = rotateVector(currentEyeX, currentEyeY, currentHeadAngle);
+                    return {
+                        pivotX: params.headPivotX,
+                        pivotY: params.headPivotY,
+                        angle: currentHeadAngle,
+                        offX: currentHeadX + eyeLocal.x,
+                        offY: currentHeadY + eyeLocal.y
+                    };
+                }
                 case 'pupil': {
-                    // 瞳孔 = 头部 + 眼睛 + 额外微动（限制在眼眶内）
-                    const baseX = currentHeadX + currentEyeX;
-                    const baseY = currentHeadY + currentEyeY;
                     let extraX = (currentEyeX / (params.maxEyeMove || 1)) * params.maxPupilMove;
                     let extraY = (currentEyeY / (params.maxEyeMove || 1)) * params.maxPupilMove;
                     extraX = Math.max(-params.pupilLimitX, Math.min(params.pupilLimitX, extraX));
                     extraY = Math.max(-params.pupilLimitY, Math.min(params.pupilLimitY, extraY));
-                    return { x: baseX + extraX, y: baseY + extraY };
+                    // 总局部偏移 = 眼睛偏移 + 瞳孔额外偏移
+                    const totalLocalX = currentEyeX + extraX;
+                    const totalLocalY = currentEyeY + extraY;
+                    const totalWorld = rotateVector(totalLocalX, totalLocalY, currentHeadAngle);
+                    return {
+                        pivotX: params.headPivotX,
+                        pivotY: params.headPivotY,
+                        angle: currentHeadAngle,
+                        offX: currentHeadX + totalWorld.x,
+                        offY: currentHeadY + totalWorld.y
+                    };
                 }
-                default: return { x: 0, y: 0 };
+                default:
+                    return { pivotX: 0, pivotY: 0, angle: 0, offX: 0, offY: 0 };
             }
         }
 
@@ -305,30 +415,59 @@
             for (const cfg of layerConfigs) {
                 const img = images[cfg.name];
                 const pos = layerPositions[cfg.name];
-                const off = getLayerOffset(cfg.group);
-                if (img && pos) {
-                    ctx.drawImage(img, pos.x + off.x, pos.y + off.y, pos.w, pos.h);
+                const t = getLayerTransform(cfg.group);
+                if (!img || !pos) continue;
+
+                if (t.angle === 0) {
+                    ctx.drawImage(img, pos.x + t.offX, pos.y + t.offY, pos.w, pos.h);
+                } else {
+                    ctx.save();
+                    ctx.translate(t.pivotX + t.offX, t.pivotY + t.offY);
+                    ctx.rotate(t.angle);
+                    ctx.drawImage(img, pos.x - t.pivotX, pos.y - t.pivotY, pos.w, pos.h);
+                    ctx.restore();
                 }
             }
 
-            // 调试：绘制眼眶边界
+            // 调试：绘制眼眶边界与旋转中心
             if (params.debug) {
-                const eyeOff = getLayerOffset('eye');
-                const pupilOff = getLayerOffset('pupil');
+                const eyeT = getLayerTransform('eye');
+                const pupilT = getLayerTransform('pupil');
                 const ew = layerPositions.eyewhite;
                 const ir = layerPositions.irides;
 
+                // 绘制旋转中心
+                ctx.fillStyle = '#ff0';
+                ctx.beginPath();
+                ctx.arc(params.headPivotX, params.headPivotY, 4, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = '#0ff';
+                ctx.beginPath();
+                ctx.arc(params.bodyPivotX, params.bodyPivotY, 4, 0, Math.PI*2);
+                ctx.fill();
+
+                // eyewhite 边界（在世界坐标系中）
+                ctx.save();
+                ctx.translate(eyeT.pivotX + eyeT.offX, eyeT.pivotY + eyeT.offY);
+                ctx.rotate(eyeT.angle);
                 ctx.strokeStyle = '#0f0';
                 ctx.lineWidth = 2;
-                ctx.strokeRect(ew.x + eyeOff.x, ew.y + eyeOff.y, ew.w, ew.h);
+                ctx.strokeRect(ew.x - eyeT.pivotX, ew.y - eyeT.pivotY, ew.w, ew.h);
+                ctx.restore();
 
+                // irides 边界
+                ctx.save();
+                ctx.translate(pupilT.pivotX + pupilT.offX, pupilT.pivotY + pupilT.offY);
+                ctx.rotate(pupilT.angle);
                 ctx.strokeStyle = '#f00';
-                ctx.strokeRect(ir.x + pupilOff.x, ir.y + pupilOff.y, ir.w, ir.h);
+                ctx.lineWidth = 2;
+                ctx.strokeRect(ir.x - pupilT.pivotX, ir.y - pupilT.pivotY, ir.w, ir.h);
+                ctx.restore();
 
                 ctx.fillStyle = '#fff';
                 ctx.font = '12px sans-serif';
-                ctx.fillText('eyewhite', ew.x + eyeOff.x, ew.y + eyeOff.y - 4);
-                ctx.fillText('irides',   ir.x + pupilOff.x, ir.y + pupilOff.y - 4);
+                ctx.fillText('headPivot', params.headPivotX + 6, params.headPivotY);
+                ctx.fillText('bodyPivot', params.bodyPivotX + 6, params.bodyPivotY);
             }
         }
 
