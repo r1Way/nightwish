@@ -5,42 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live2D - 桌上自习</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #2a2a2a;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #2a2a2a; }
         #live2d-canvas {
-            position: fixed;
-            top: 50%;
-            left: 50%;
+            position: fixed; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 9999;
+            pointer-events: none; z-index: 9999;
         }
         .content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-family: sans-serif;
-            font-size: 2rem;
+            width: 100%; height: 100%; display: flex;
+            align-items: center; justify-content: center;
+            color: #fff; font-family: sans-serif; font-size: 2rem;
         }
+
+        /* 配置面板 */
+        #config-panel {
+            position: fixed; top: 12px; right: 12px;
+            width: 280px; max-height: calc(100vh - 24px);
+            background: rgba(30, 30, 35, 0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: #ddd; font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px; z-index: 100000;
+            overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        #config-header {
+            padding: 12px 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            user-select: none;
+        }
+        #config-header:hover { background: rgba(255,255,255,0.04); }
+        #config-header h3 { font-size: 14px; font-weight: 600; color: #fff; }
+        #config-toggle { transition: transform 0.2s; font-size: 12px; }
+        #config-panel.collapsed #config-toggle { transform: rotate(-90deg); }
+        #config-panel.collapsed #config-body { display: none; }
+        #config-body { padding: 10px 14px 14px; overflow-y: auto; }
+
+        .cfg-row { margin-bottom: 10px; }
+        .cfg-row:last-child { margin-bottom: 0; }
+        .cfg-label {
+            display: flex; justify-content: space-between;
+            margin-bottom: 4px; color: #bbb; font-size: 12px;
+        }
+        .cfg-label span:first-child { font-weight: 500; }
+        .cfg-label .cfg-val { color: #6ec3ff; font-variant-numeric: tabular-nums; }
+        input[type=range] {
+            width: 100%; height: 4px; cursor: pointer;
+            -webkit-appearance: none; appearance: none;
+            background: rgba(255,255,255,0.15); border-radius: 2px; outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px;
+            background: #6ec3ff; border-radius: 50%; border: 2px solid #1e1e23;
+            box-shadow: 0 0 6px rgba(110,195,255,0.4);
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 14px; height: 14px; background: #6ec3ff;
+            border-radius: 50%; border: 2px solid #1e1e23;
+            box-shadow: 0 0 6px rgba(110,195,255,0.4);
+        }
+        .cfg-hint {
+            font-size: 11px; color: #888; margin-top: 2px; line-height: 1.4;
+        }
+        .cfg-sep {
+            height: 1px; background: rgba(255,255,255,0.08);
+            margin: 12px 0;
+        }
+        .cfg-check {
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+        }
+        .cfg-check input { width: 16px; height: 16px; accent-color: #6ec3ff; }
     </style>
 </head>
 <body>
     <canvas id="live2d-canvas" width="1280" height="1280"></canvas>
-    
     <div class="content">
         <p>背景内容区域 —— Canvas 已设置 pointer-events: none，鼠标可穿透点击此处</p>
+    </div>
+
+    <!-- 配置面板 -->
+    <div id="config-panel">
+        <div id="config-header">
+            <h3>⚙ 参数调节</h3>
+            <span id="config-toggle">▼</span>
+        </div>
+        <div id="config-body">
+            <div class="cfg-row">
+                <div class="cfg-label"><span>头部最大移动</span><span class="cfg-val" id="v-head">12</span></div>
+                <input type="range" id="r-head" min="0" max="30" step="0.5" value="12">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>眼睛最大移动</span><span class="cfg-val" id="v-eye">6</span></div>
+                <input type="range" id="r-eye" min="0" max="20" step="0.5" value="6">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>瞳孔额外移动</span><span class="cfg-val" id="v-pupil">3</span></div>
+                <input type="range" id="r-pupil" min="0" max="10" step="0.5" value="3">
+                <div class="cfg-hint">相对眼白的独立微动幅度</div>
+            </div>
+            <div class="cfg-sep"></div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>头部平滑系数</span><span class="cfg-val" id="v-lhead">0.08</span></div>
+                <input type="range" id="r-lhead" min="0.01" max="0.30" step="0.01" value="0.08">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>眼睛平滑系数</span><span class="cfg-val" id="v-leye">0.12</span></div>
+                <input type="range" id="r-leye" min="0.01" max="0.30" step="0.01" value="0.12">
+            </div>
+            <div class="cfg-sep"></div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>瞳孔水平限位</span><span class="cfg-val" id="v-px">5</span></div>
+                <input type="range" id="r-px" min="0" max="10" step="0.5" value="5">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>瞳孔垂直限位</span><span class="cfg-val" id="v-py">0</span></div>
+                <input type="range" id="r-py" min="0" max="5" step="0.5" value="0">
+                <div class="cfg-hint">建议保持 0，眼白与瞳孔几乎等高</div>
+            </div>
+            <div class="cfg-sep"></div>
+            <label class="cfg-check">
+                <input type="checkbox" id="c-debug">
+                <span>显示眼眶调试框</span>
+            </label>
+        </div>
     </div>
 
     <script>
@@ -56,7 +146,7 @@
             { name: 'legwear',     filename: 'layers/legwear.png',     group: 'body' },
             { name: 'footwear',    filename: 'layers/footwear.png',    group: 'body' },
             { name: 'topwear',     filename: 'layers/topwear.png',     group: 'body' },
-            { name: 'objects',     filename: 'layers/objects.png',     group: 'body' },  // 桌子遮挡下半身与上衣下摆
+            { name: 'objects',     filename: 'layers/objects.png',     group: 'body' },
             { name: 'handwear',    filename: 'layers/handwear.png',    group: 'body' },
             { name: 'ears',        filename: 'layers/ears.png',        group: 'head' },
             { name: 'face',        filename: 'layers/face.png',        group: 'head' },
@@ -70,7 +160,6 @@
             { name: 'headwear',    filename: 'layers/headwear.png',    group: 'head' },
         ];
 
-        // 固定位置信息（从PSD导出）
         const layerPositions = {
             objects:     { x: 160,  y: 470,  w: 960, h: 810 },
             bottomwear:  { x: 511,  y: 728,  w: 338, h: 152 },
@@ -92,16 +181,48 @@
             headwear:    { x: 673,  y: 152,  w: 79,  h: 87  },
         };
 
-        // 脸部中心（近似）
         const FACE_CENTER_X = 624;
         const FACE_CENTER_Y = 258;
 
-        // 参数
-        const MAX_HEAD_MOVE = 12;      // 头部最大移动像素
-        const MAX_EYE_MOVE = 6;        // 眼睛整体最大移动像素
-        const MAX_PUPIL_MOVE = 4;      // 瞳孔额外移动像素
-        const LERP_FACTOR_HEAD = 0.08; // 头部跟随平滑系数
-        const LERP_FACTOR_EYE = 0.12;  // 眼睛跟随平滑系数
+        // ========== 可调参数（绑定到配置面板） ==========
+        const params = {
+            maxHeadMove: 12,
+            maxEyeMove: 6,
+            maxPupilMove: 3,
+            lerpHead: 0.08,
+            lerpEye: 0.12,
+            pupilLimitX: 5,
+            pupilLimitY: 0,
+            debug: false
+        };
+
+        // 绑定配置面板
+        function bindParam(id, key, fmt = v => v) {
+            const el = document.getElementById('r-' + id);
+            const disp = document.getElementById('v-' + id);
+            el.addEventListener('input', () => {
+                const v = parseFloat(el.value);
+                params[key] = v;
+                disp.textContent = fmt(v);
+            });
+        }
+        bindParam('head',  'maxHeadMove');
+        bindParam('eye',   'maxEyeMove');
+        bindParam('pupil', 'maxPupilMove');
+        bindParam('lhead', 'lerpHead',    v => v.toFixed(2));
+        bindParam('leye',  'lerpEye',     v => v.toFixed(2));
+        bindParam('px',    'pupilLimitX');
+        bindParam('py',    'pupilLimitY');
+
+        document.getElementById('c-debug').addEventListener('change', e => {
+            params.debug = e.target.checked;
+        });
+
+        // 面板折叠
+        const panel = document.getElementById('config-panel');
+        document.getElementById('config-header').addEventListener('click', () => {
+            panel.classList.toggle('collapsed');
+        });
 
         // 状态
         let mouseX = window.innerWidth / 2;
@@ -114,129 +235,103 @@
         let loadedCount = 0;
         let allLoaded = false;
 
-        // 加载图片
         function loadImages() {
             layerConfigs.forEach(cfg => {
                 const img = new Image();
                 img.src = cfg.filename;
-                img.onload = () => {
-                    images[cfg.name] = img;
-                    loadedCount++;
-                    if (loadedCount === layerConfigs.length) {
-                        allLoaded = true;
-                    }
-                };
-                img.onerror = () => {
-                    console.error('Failed to load:', cfg.filename);
-                    loadedCount++;
-                };
+                img.onload = () => { images[cfg.name] = img; loadedCount++; if (loadedCount === layerConfigs.length) allLoaded = true; };
+                img.onerror = () => { console.error('Failed to load:', cfg.filename); loadedCount++; };
             });
         }
 
-        // 监听鼠标
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
+        document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
 
-        // 线性插值
-        function lerp(a, b, t) {
-            return a + (b - a) * t;
-        }
+        function lerp(a, b, t) { return a + (b - a) * t; }
 
-        // 将鼠标坐标转换为画布内坐标，并计算相对于中心的归一化偏移
         function getMouseOffset() {
             const rect = canvas.getBoundingClientRect();
             const scaleX = CANVAS_SIZE / rect.width;
             const scaleY = CANVAS_SIZE / rect.height;
-            const canvasMouseX = (mouseX - rect.left) * scaleX;
-            const canvasMouseY = (mouseY - rect.top) * scaleY;
-            
-            const dx = canvasMouseX - FACE_CENTER_X;
-            const dy = canvasMouseY - FACE_CENTER_Y;
-            
-            // 归一化到 [-1, 1]
+            const cx = (mouseX - rect.left) * scaleX;
+            const cy = (mouseY - rect.top) * scaleY;
+            const dx = cx - FACE_CENTER_X;
+            const dy = cy - FACE_CENTER_Y;
             const maxDist = CANVAS_SIZE * 0.6;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const clampedDist = Math.min(dist, maxDist);
-            const factor = clampedDist / maxDist;
-            
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const factor = Math.min(dist, maxDist) / maxDist;
             const angle = Math.atan2(dy, dx);
-            return {
-                x: Math.cos(angle) * factor,
-                y: Math.sin(angle) * factor
-            };
+            return { x: Math.cos(angle)*factor, y: Math.sin(angle)*factor };
         }
 
-        // 更新目标位置
         function updateTargets() {
-            const offset = getMouseOffset();
-            
-            targetHeadX = offset.x * MAX_HEAD_MOVE;
-            targetHeadY = offset.y * MAX_HEAD_MOVE;
-            
-            targetEyeX = offset.x * MAX_EYE_MOVE;
-            targetEyeY = offset.y * MAX_EYE_MOVE;
+            const off = getMouseOffset();
+            targetHeadX = off.x * params.maxHeadMove;
+            targetHeadY = off.y * params.maxHeadMove;
+            targetEyeX  = off.x * params.maxEyeMove;
+            targetEyeY  = off.y * params.maxEyeMove;
         }
 
-        // 平滑更新当前位置
         function updateCurrent() {
-            currentHeadX = lerp(currentHeadX, targetHeadX, LERP_FACTOR_HEAD);
-            currentHeadY = lerp(currentHeadY, targetHeadY, LERP_FACTOR_HEAD);
-            
-            currentEyeX = lerp(currentEyeX, targetEyeX, LERP_FACTOR_EYE);
-            currentEyeY = lerp(currentEyeY, targetEyeY, LERP_FACTOR_EYE);
+            currentHeadX = lerp(currentHeadX, targetHeadX, params.lerpHead);
+            currentHeadY = lerp(currentHeadY, targetHeadY, params.lerpHead);
+            currentEyeX  = lerp(currentEyeX,  targetEyeX,  params.lerpEye);
+            currentEyeY  = lerp(currentEyeY,  targetEyeY,  params.lerpEye);
         }
 
-        // 获取某层的绘制偏移
         function getLayerOffset(group) {
             switch (group) {
-                case 'body': return { x: 0, y: 0 };
-                case 'head': return { x: currentHeadX, y: currentHeadY };
-                case 'eye':  return { x: currentEyeX,  y: currentEyeY };
+                case 'body':  return { x: 0, y: 0 };
+                case 'head':  return { x: currentHeadX, y: currentHeadY };
+                // 眼睛应整体跟随头部，再叠加独立微动
+                case 'eye':   return { x: currentHeadX + currentEyeX, y: currentHeadY + currentEyeY };
                 case 'pupil': {
-                    // 基础偏移 = 头部 + 眼睛
+                    // 瞳孔 = 头部 + 眼睛 + 额外微动（限制在眼眶内）
                     const baseX = currentHeadX + currentEyeX;
                     const baseY = currentHeadY + currentEyeY;
-                    // 额外瞳孔偏移（相对眼白的独立微动）
-                    let extraX = (currentEyeX / MAX_EYE_MOVE) * MAX_PUPIL_MOVE;
-                    let extraY = (currentEyeY / MAX_EYE_MOVE) * MAX_PUPIL_MOVE;
-                    // 限制在眼眶范围内：
-                    // eyewhite(570,266,97x29) vs irides(576,265,85x30)
-                    // 水平余量约6px/边；垂直方向irides几乎与眼白等高且原始已偏高1px，
-                    // 为避免移出眼眶，垂直方向只做整体跟随，不做额外相对移动。
-                    extraX = Math.max(-5, Math.min(5, extraX));
-                    extraY = 0;
+                    let extraX = (currentEyeX / (params.maxEyeMove || 1)) * params.maxPupilMove;
+                    let extraY = (currentEyeY / (params.maxEyeMove || 1)) * params.maxPupilMove;
+                    extraX = Math.max(-params.pupilLimitX, Math.min(params.pupilLimitX, extraX));
+                    extraY = Math.max(-params.pupilLimitY, Math.min(params.pupilLimitY, extraY));
                     return { x: baseX + extraX, y: baseY + extraY };
                 }
                 default: return { x: 0, y: 0 };
             }
         }
 
-        // 绘制一帧
         function draw() {
             ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-            
             if (!allLoaded) return;
 
             for (const cfg of layerConfigs) {
                 const img = images[cfg.name];
                 const pos = layerPositions[cfg.name];
-                const offset = getLayerOffset(cfg.group);
-                
+                const off = getLayerOffset(cfg.group);
                 if (img && pos) {
-                    ctx.drawImage(
-                        img,
-                        pos.x + offset.x,
-                        pos.y + offset.y,
-                        pos.w,
-                        pos.h
-                    );
+                    ctx.drawImage(img, pos.x + off.x, pos.y + off.y, pos.w, pos.h);
                 }
+            }
+
+            // 调试：绘制眼眶边界
+            if (params.debug) {
+                const eyeOff = getLayerOffset('eye');
+                const pupilOff = getLayerOffset('pupil');
+                const ew = layerPositions.eyewhite;
+                const ir = layerPositions.irides;
+
+                ctx.strokeStyle = '#0f0';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(ew.x + eyeOff.x, ew.y + eyeOff.y, ew.w, ew.h);
+
+                ctx.strokeStyle = '#f00';
+                ctx.strokeRect(ir.x + pupilOff.x, ir.y + pupilOff.y, ir.w, ir.h);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px sans-serif';
+                ctx.fillText('eyewhite', ew.x + eyeOff.x, ew.y + eyeOff.y - 4);
+                ctx.fillText('irides',   ir.x + pupilOff.x, ir.y + pupilOff.y - 4);
             }
         }
 
-        // 动画循环
         function animate() {
             updateTargets();
             updateCurrent();
@@ -244,7 +339,6 @@
             requestAnimationFrame(animate);
         }
 
-        // 响应式缩放
         function resizeCanvas() {
             const size = Math.min(window.innerWidth, window.innerHeight);
             canvas.style.width = size + 'px';
@@ -253,7 +347,6 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 启动
         loadImages();
         animate();
     </script>
