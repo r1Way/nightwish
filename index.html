@@ -257,7 +257,14 @@
         bindParam('pupil', 'maxPupilMove');
         bindParam('hang',  'maxHeadAngle',  v => v, '°');
         bindParam('bang',  'maxBodyAngle',  v => v, '°');
-        bindParam('legb',  'legBendFactor', v => Math.round(v * 100), '%');
+        // 腿部弯曲：滑块值 0~100，实际参数 0~1
+        const rLegb = document.getElementById('r-legb');
+        const vLegb = document.getElementById('v-legb');
+        rLegb.addEventListener('input', () => {
+            const v = parseInt(rLegb.value);
+            params.legBendFactor = v / 100;
+            vLegb.textContent = v + '%';
+        });
         bindParam('lhead', 'lerpHead',      v => v.toFixed(2));
         bindParam('leye',  'lerpEye',       v => v.toFixed(2));
         bindParam('px',    'pupilLimitX');
