@@ -1,0 +1,182 @@
+[
+  {
+    "name": "objects",
+    "filename": "objects.png",
+    "x": 160,
+    "y": 470,
+    "width": 960,
+    "height": 810,
+    "centerX": 640.0,
+    "centerY": 875.0
+  },
+  {
+    "name": "bottomwear",
+    "filename": "bottomwear.png",
+    "x": 511,
+    "y": 728,
+    "width": 338,
+    "height": 152,
+    "centerX": 680.0,
+    "centerY": 804.0
+  },
+  {
+    "name": "legwear",
+    "filename": "legwear.png",
+    "x": 391,
+    "y": 724,
+    "width": 429,
+    "height": 456,
+    "centerX": 605.5,
+    "centerY": 952.0
+  },
+  {
+    "name": "topwear",
+    "filename": "topwear.png",
+    "x": 563,
+    "y": 327,
+    "width": 304,
+    "height": 470,
+    "centerX": 715.0,
+    "centerY": 562.0
+  },
+  {
+    "name": "footwear",
+    "filename": "footwear.png",
+    "x": 291,
+    "y": 1114,
+    "width": 362,
+    "height": 166,
+    "centerX": 472.0,
+    "centerY": 1197.0
+  },
+  {
+    "name": "back hair",
+    "filename": "back_hair.png",
+    "x": 518,
+    "y": 99,
+    "width": 269,
+    "height": 279,
+    "centerX": 652.5,
+    "centerY": 238.5
+  },
+  {
+    "name": "neck",
+    "filename": "neck.png",
+    "x": 622,
+    "y": 246,
+    "width": 98,
+    "height": 133,
+    "centerX": 671.0,
+    "centerY": 312.5
+  },
+  {
+    "name": "handwear",
+    "filename": "handwear.png",
+    "x": 432,
+    "y": 353,
+    "width": 441,
+    "height": 260,
+    "centerX": 652.5,
+    "centerY": 483.0
+  },
+  {
+    "name": "ears",
+    "filename": "ears.png",
+    "x": 565,
+    "y": 238,
+    "width": 156,
+    "height": 72,
+    "centerX": 643.0,
+    "centerY": 274.0
+  },
+  {
+    "name": "face",
+    "filename": "face.png",
+    "x": 548,
+    "y": 170,
+    "width": 152,
+    "height": 177,
+    "centerX": 624.0,
+    "centerY": 258.5
+  },
+  {
+    "name": "mouth",
+    "filename": "mouth.png",
+    "x": 618,
+    "y": 325,
+    "width": 14,
+    "height": 6,
+    "centerX": 625.0,
+    "centerY": 328.0
+  },
+  {
+    "name": "eyebrow",
+    "filename": "eyebrow.png",
+    "x": 554,
+    "y": 247,
+    "width": 111,
+    "height": 16,
+    "centerX": 609.5,
+    "centerY": 255.0
+  },
+  {
+    "name": "nose",
+    "filename": "nose.png",
+    "x": 601,
+    "y": 298,
+    "width": 9,
+    "height": 17,
+    "centerX": 605.5,
+    "centerY": 306.5
+  },
+  {
+    "name": "eyewhite",
+    "filename": "eyewhite.png",
+    "x": 570,
+    "y": 266,
+    "width": 97,
+    "height": 29,
+    "centerX": 618.5,
+    "centerY": 280.5
+  },
+  {
+    "name": "eyelash",
+    "filename": "eyelash.png",
+    "x": 559,
+    "y": 259,
+    "width": 119,
+    "height": 38,
+    "centerX": 618.5,
+    "centerY": 278.0
+  },
+  {
+    "name": "irides",
+    "filename": "irides.png",
+    "x": 576,
+    "y": 265,
+    "width": 85,
+    "height": 30,
+    "centerX": 618.5,
+    "centerY": 280.0
+  },
+  {
+    "name": "front hair",
+    "filename": "front_hair.png",
+    "x": 527,
+    "y": 127,
+    "width": 186,
+    "height": 224,
+    "centerX": 620.0,
+    "centerY": 239.0
+  },
+  {
+    "name": "headwear",
+    "filename": "headwear.png",
+    "x": 673,
+    "y": 152,
+    "width": 79,
+    "height": 87,
+    "centerX": 712.5,
+    "centerY": 195.5
+  }
+]

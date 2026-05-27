@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live2D - 桌上自习</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #2a2a2a;
+        }
+        #live2d-canvas {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: sans-serif;
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="live2d-canvas" width="1280" height="1280"></canvas>
+    
+    <div class="content">
+        <p>背景内容区域 —— Canvas 已设置 pointer-events: none，鼠标可穿透点击此处</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('live2d-canvas');
+        const ctx = canvas.getContext('2d');
+        const CANVAS_SIZE = 1280;
+
+        // 图层配置（绘制顺序：从后到前）
+        const layerConfigs = [
+            { name: 'back_hair',   filename: 'layers/back_hair.png',   group: 'head' },
+            { name: 'neck',        filename: 'layers/neck.png',        group: 'head' },
+            { name: 'bottomwear',  filename: 'layers/bottomwear.png',  group: 'body' },
+            { name: 'legwear',     filename: 'layers/legwear.png',     group: 'body' },
+            { name: 'footwear',    filename: 'layers/footwear.png',    group: 'body' },
+            { name: 'topwear',     filename: 'layers/topwear.png',     group: 'body' },
+            { name: 'objects',     filename: 'layers/objects.png',     group: 'body' },  // 桌子遮挡下半身与上衣下摆
+            { name: 'handwear',    filename: 'layers/handwear.png',    group: 'body' },
+            { name: 'ears',        filename: 'layers/ears.png',        group: 'head' },
+            { name: 'face',        filename: 'layers/face.png',        group: 'head' },
+            { name: 'eyewhite',    filename: 'layers/eyewhite.png',    group: 'eye' },
+            { name: 'irides',      filename: 'layers/irides.png',      group: 'pupil' },
+            { name: 'eyelash',     filename: 'layers/eyelash.png',     group: 'eye' },
+            { name: 'eyebrow',     filename: 'layers/eyebrow.png',     group: 'eye' },
+            { name: 'nose',        filename: 'layers/nose.png',        group: 'eye' },
+            { name: 'mouth',       filename: 'layers/mouth.png',       group: 'eye' },
+            { name: 'front_hair',  filename: 'layers/front_hair.png',  group: 'head' },
+            { name: 'headwear',    filename: 'layers/headwear.png',    group: 'head' },
+        ];
+
+        // 固定位置信息（从PSD导出）
+        const layerPositions = {
+            objects:     { x: 160,  y: 470,  w: 960, h: 810 },
+            bottomwear:  { x: 511,  y: 728,  w: 338, h: 152 },
+            legwear:     { x: 391,  y: 724,  w: 429, h: 456 },
+            footwear:    { x: 291,  y: 1114, w: 362, h: 166 },
+            topwear:     { x: 563,  y: 327,  w: 304, h: 470 },
+            handwear:    { x: 432,  y: 353,  w: 441, h: 260 },
+            back_hair:   { x: 518,  y: 99,   w: 269, h: 279 },
+            neck:        { x: 622,  y: 246,  w: 98,  h: 133 },
+            ears:        { x: 565,  y: 238,  w: 156, h: 72  },
+            face:        { x: 548,  y: 170,  w: 152, h: 177 },
+            eyewhite:    { x: 570,  y: 266,  w: 97,  h: 29  },
+            irides:      { x: 576,  y: 265,  w: 85,  h: 30  },
+            eyelash:     { x: 559,  y: 259,  w: 119, h: 38  },
+            eyebrow:     { x: 554,  y: 247,  w: 111, h: 16  },
+            nose:        { x: 601,  y: 298,  w: 9,   h: 17  },
+            mouth:       { x: 618,  y: 325,  w: 14,  h: 6   },
+            front_hair:  { x: 527,  y: 127,  w: 186, h: 224 },
+            headwear:    { x: 673,  y: 152,  w: 79,  h: 87  },
+        };
+
+        // 脸部中心（近似）
+        const FACE_CENTER_X = 624;
+        const FACE_CENTER_Y = 258;
+
+        // 参数
+        const MAX_HEAD_MOVE = 12;      // 头部最大移动像素
+        const MAX_EYE_MOVE = 6;        // 眼睛整体最大移动像素
+        const MAX_PUPIL_MOVE = 4;      // 瞳孔额外移动像素
+        const LERP_FACTOR_HEAD = 0.08; // 头部跟随平滑系数
+        const LERP_FACTOR_EYE = 0.12;  // 眼睛跟随平滑系数
+
+        // 状态
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let targetHeadX = 0, targetHeadY = 0;
+        let currentHeadX = 0, currentHeadY = 0;
+        let targetEyeX = 0, targetEyeY = 0;
+        let currentEyeX = 0, currentEyeY = 0;
+        let images = {};
+        let loadedCount = 0;
+        let allLoaded = false;
+
+        // 加载图片
+        function loadImages() {
+            layerConfigs.forEach(cfg => {
+                const img = new Image();
+                img.src = cfg.filename;
+                img.onload = () => {
+                    images[cfg.name] = img;
+                    loadedCount++;
+                    if (loadedCount === layerConfigs.length) {
+                        allLoaded = true;
+                    }
+                };
+                img.onerror = () => {
+                    console.error('Failed to load:', cfg.filename);
+                    loadedCount++;
+                };
+            });
+        }
+
+        // 监听鼠标
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // 线性插值
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+
+        // 将鼠标坐标转换为画布内坐标，并计算相对于中心的归一化偏移
+        function getMouseOffset() {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = CANVAS_SIZE / rect.width;
+            const scaleY = CANVAS_SIZE / rect.height;
+            const canvasMouseX = (mouseX - rect.left) * scaleX;
+            const canvasMouseY = (mouseY - rect.top) * scaleY;
+            
+            const dx = canvasMouseX - FACE_CENTER_X;
+            const dy = canvasMouseY - FACE_CENTER_Y;
+            
+            // 归一化到 [-1, 1]
+            const maxDist = CANVAS_SIZE * 0.6;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const clampedDist = Math.min(dist, maxDist);
+            const factor = clampedDist / maxDist;
+            
+            const angle = Math.atan2(dy, dx);
+            return {
+                x: Math.cos(angle) * factor,
+                y: Math.sin(angle) * factor
+            };
+        }
+
+        // 更新目标位置
+        function updateTargets() {
+            const offset = getMouseOffset();
+            
+            targetHeadX = offset.x * MAX_HEAD_MOVE;
+            targetHeadY = offset.y * MAX_HEAD_MOVE;
+            
+            targetEyeX = offset.x * MAX_EYE_MOVE;
+            targetEyeY = offset.y * MAX_EYE_MOVE;
+        }
+
+        // 平滑更新当前位置
+        function updateCurrent() {
+            currentHeadX = lerp(currentHeadX, targetHeadX, LERP_FACTOR_HEAD);
+            currentHeadY = lerp(currentHeadY, targetHeadY, LERP_FACTOR_HEAD);
+            
+            currentEyeX = lerp(currentEyeX, targetEyeX, LERP_FACTOR_EYE);
+            currentEyeY = lerp(currentEyeY, targetEyeY, LERP_FACTOR_EYE);
+        }
+
+        // 获取某层的绘制偏移
+        function getLayerOffset(group) {
+            switch (group) {
+                case 'body': return { x: 0, y: 0 };
+                case 'head': return { x: currentHeadX, y: currentHeadY };
+                case 'eye':  return { x: currentEyeX,  y: currentEyeY };
+                case 'pupil': {
+                    // 基础偏移 = 头部 + 眼睛
+                    const baseX = currentHeadX + currentEyeX;
+                    const baseY = currentHeadY + currentEyeY;
+                    // 额外瞳孔偏移（相对眼白的独立微动）
+                    let extraX = (currentEyeX / MAX_EYE_MOVE) * MAX_PUPIL_MOVE;
+                    let extraY = (currentEyeY / MAX_EYE_MOVE) * MAX_PUPIL_MOVE;
+                    // 限制在眼眶范围内：
+                    // eyewhite(570,266,97x29) vs irides(576,265,85x30)
+                    // 水平余量约6px/边；垂直方向irides几乎与眼白等高且原始已偏高1px，
+                    // 为避免移出眼眶，垂直方向只做整体跟随，不做额外相对移动。
+                    extraX = Math.max(-5, Math.min(5, extraX));
+                    extraY = 0;
+                    return { x: baseX + extraX, y: baseY + extraY };
+                }
+                default: return { x: 0, y: 0 };
+            }
+        }
+
+        // 绘制一帧
+        function draw() {
+            ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+            
+            if (!allLoaded) return;
+
+            for (const cfg of layerConfigs) {
+                const img = images[cfg.name];
+                const pos = layerPositions[cfg.name];
+                const offset = getLayerOffset(cfg.group);
+                
+                if (img && pos) {
+                    ctx.drawImage(
+                        img,
+                        pos.x + offset.x,
+                        pos.y + offset.y,
+                        pos.w,
+                        pos.h
+                    );
+                }
+            }
+        }
+
+        // 动画循环
+        function animate() {
+            updateTargets();
+            updateCurrent();
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        // 响应式缩放
+        function resizeCanvas() {
+            const size = Math.min(window.innerWidth, window.innerHeight);
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // 启动
+        loadImages();
+        animate();
+    </script>
+</body>
+</html>
