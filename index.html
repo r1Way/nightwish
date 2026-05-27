@@ -390,15 +390,13 @@
                 case 'leg': {
                     const bend = params.legBendFactor;
                     const a = currentBodyAngle;
-                    // 仿射变换模拟膝盖弯曲：
-                    // skewX 让远离旋转中心的部分产生水平偏移（透视感）
-                    // scaleY 让腿部视觉缩短
-                    // 系数放大 4 倍让效果更明显
-                    const skewX = -a * bend * 4.0;
-                    const scaleY = 1 - Math.abs(a) * bend * 1.2;
-                    // 额外平移：弯曲时膝盖区域整体有位移
-                    const legOffX = a * bend * 60;
-                    const legOffY = Math.abs(a) * bend * 30;
+                    // 仿射变换模拟膝盖弯曲
+                    // 身体左转(a<0)时：大腿根部基本固定，小腿向前/左偏移
+                    // 通过强倾斜+压缩+位移组合来模拟
+                    const skewX = -a * bend * 12.0;
+                    const scaleY = 1 - Math.abs(a) * bend * 4.0;
+                    const legOffX = a * bend * 250;
+                    const legOffY = Math.abs(a) * bend * 120;
                     return {
                         pivotX: params.bodyPivotX,
                         pivotY: params.bodyPivotY,
