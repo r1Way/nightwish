@@ -135,8 +135,8 @@
                 <input type="range" id="r-bpx" min="500" max="900" step="5" value="680">
             </div>
             <div class="cfg-row">
-                <div class="cfg-label"><span>身体旋转中心 Y</span><span class="cfg-val" id="v-bpy">600</span></div>
-                <input type="range" id="r-bpy" min="400" max="900" step="5" value="600">
+                <div class="cfg-label"><span>身体旋转中心 Y</span><span class="cfg-val" id="v-bpy">850</span></div>
+                <input type="range" id="r-bpy" min="600" max="1100" step="5" value="850">
             </div>
 
             <div class="cfg-sep"></div>
@@ -165,7 +165,7 @@
             <div class="cfg-sep"></div>
             <label class="cfg-check">
                 <input type="checkbox" id="c-debug">
-                <span>显示眼眶调试框</span>
+                <span>显示调试框</span>
             </label>
         </div>
     </div>
@@ -182,9 +182,9 @@
             { name: 'legwear',     filename: 'layers/legwear.png',     group: 'body' },
             { name: 'footwear',    filename: 'layers/footwear.png',    group: 'body' },
             { name: 'topwear',     filename: 'layers/topwear.png',     group: 'body' },
+            { name: 'neck',        filename: 'layers/neck.png',        group: 'body' },
             { name: 'objects',     filename: 'layers/objects.png',     group: 'prop' },
             { name: 'handwear',    filename: 'layers/handwear.png',    group: 'body' },
-            { name: 'neck',        filename: 'layers/neck.png',        group: 'head' },
             { name: 'ears',        filename: 'layers/ears.png',        group: 'head' },
             { name: 'face',        filename: 'layers/face.png',        group: 'head' },
             { name: 'eyewhite',    filename: 'layers/eyewhite.png',    group: 'eye' },
@@ -231,7 +231,7 @@
             headPivotX: 640,
             headPivotY: 330,
             bodyPivotX: 680,
-            bodyPivotY: 600,
+            bodyPivotY: 850,
             lerpHead: 0.08,
             lerpEye: 0.12,
             pupilLimitX: 5,
@@ -278,16 +278,10 @@
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
 
-        // 头部平移
         let targetHeadX = 0, targetHeadY = 0;
         let currentHeadX = 0, currentHeadY = 0;
-        // 头部旋转
-        let targetHeadAngle = 0;
-        let currentHeadAngle = 0;
-        // 身体旋转
-        let targetBodyAngle = 0;
-        let currentBodyAngle = 0;
-        // 眼睛平移
+        let targetHeadAngle = 0, currentHeadAngle = 0;
+        let targetBodyAngle = 0, currentBodyAngle = 0;
         let targetEyeX = 0, targetEyeY = 0;
         let currentEyeX = 0, currentEyeY = 0;
 
@@ -325,16 +319,12 @@
 
         function updateTargets() {
             const off = getMouseOffset();
-            // 头部平移目标
             targetHeadX = off.x * params.maxHeadMove;
             targetHeadY = off.y * params.maxHeadMove;
-            // 头部旋转目标（由水平偏移主导，带一点垂直分量）
             targetHeadAngle = off.x * params.maxHeadAngle * D2R;
-            // 身体旋转目标（滞后于头部）
             targetBodyAngle = off.x * params.maxBodyAngle * D2R;
-            // 眼睛平移目标（在头部局部坐标系中）
-            targetEyeX  = off.x * params.maxEyeMove;
-            targetEyeY  = off.y * params.maxEyeMove;
+            targetEyeX = off.x * params.maxEyeMove;
+            targetEyeY = off.y * params.maxEyeMove;
         }
 
         function updateCurrent() {
@@ -342,22 +332,34 @@
             currentHeadY = lerp(currentHeadY, targetHeadY, params.lerpHead);
             currentHeadAngle = lerp(currentHeadAngle, targetHeadAngle, params.lerpHead);
             currentBodyAngle = lerp(currentBodyAngle, targetBodyAngle, params.lerpHead);
-            currentEyeX  = lerp(currentEyeX,  targetEyeX,  params.lerpEye);
-            currentEyeY  = lerp(currentEyeY,  targetEyeY,  params.lerpEye);
+            currentEyeX = lerp(currentEyeX, targetEyeX, params.lerpEye);
+            currentEyeY = lerp(currentEyeY, targetEyeY, params.lerpEye);
         }
 
-        // 将局部偏移旋转到世界坐标系（用于眼睛/瞳孔的平移）
+        // 计算某点围绕身体旋转中心旋转后的位移（不是新坐标，是位移量）
+        function getBodyRotDelta(px, py) {
+            const dx = px - params.bodyPivotX;
+            const dy = py - params.bodyPivotY;
+            const c = Math.cos(currentBodyAngle);
+            const s = Math.sin(currentBodyAngle);
+            return {
+                x: (dx * c - dy * s) - dx,
+                y: (dx * s + dy * c) - dy
+            };
+        }
+
+        // 将局部向量旋转到世界坐标系
         function rotateVector(vx, vy, angle) {
             const c = Math.cos(angle);
             const s = Math.sin(angle);
             return { x: vx * c - vy * s, y: vx * s + vy * c };
         }
 
-        // 获取某层的绘制变换
         function getLayerTransform(group) {
             switch (group) {
                 case 'prop':
                     return { pivotX: 0, pivotY: 0, angle: 0, offX: 0, offY: 0 };
+
                 case 'body': {
                     return {
                         pivotX: params.bodyPivotX,
@@ -366,43 +368,58 @@
                         offX: 0, offY: 0
                     };
                 }
+
                 case 'head': {
+                    // 头部总角度 = 身体角度 + 头部独立角度
+                    const totalAngle = currentBodyAngle + currentHeadAngle;
+                    // 头部旋转中心先被身体旋转带到新位置
+                    const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
+                    // 头部的世界坐标平移 = 身体带来的位移 + 头部独立平移
                     return {
-                        pivotX: params.headPivotX,
-                        pivotY: params.headPivotY,
-                        angle: currentHeadAngle,
-                        offX: currentHeadX,
-                        offY: currentHeadY
+                        pivotX: params.headPivotX + pivotDelta.x,
+                        pivotY: params.headPivotY + pivotDelta.y,
+                        angle: totalAngle,
+                        offX: pivotDelta.x + currentHeadX,
+                        offY: pivotDelta.y + currentHeadY
                     };
                 }
+
                 case 'eye': {
-                    // 眼睛平移在头部局部坐标系中，需旋转到世界坐标
-                    const eyeLocal = rotateVector(currentEyeX, currentEyeY, currentHeadAngle);
+                    const totalAngle = currentBodyAngle + currentHeadAngle;
+                    const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
+                    // 眼睛偏移在头部局部坐标系中，需旋转到世界坐标
+                    const eyeWorld = rotateVector(currentEyeX, currentEyeY, totalAngle);
                     return {
-                        pivotX: params.headPivotX,
-                        pivotY: params.headPivotY,
-                        angle: currentHeadAngle,
-                        offX: currentHeadX + eyeLocal.x,
-                        offY: currentHeadY + eyeLocal.y
+                        pivotX: params.headPivotX + pivotDelta.x,
+                        pivotY: params.headPivotY + pivotDelta.y,
+                        angle: totalAngle,
+                        offX: pivotDelta.x + currentHeadX + eyeWorld.x,
+                        offY: pivotDelta.y + currentHeadY + eyeWorld.y
                     };
                 }
+
                 case 'pupil': {
+                    const totalAngle = currentBodyAngle + currentHeadAngle;
+                    const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
+
                     let extraX = (currentEyeX / (params.maxEyeMove || 1)) * params.maxPupilMove;
                     let extraY = (currentEyeY / (params.maxEyeMove || 1)) * params.maxPupilMove;
                     extraX = Math.max(-params.pupilLimitX, Math.min(params.pupilLimitX, extraX));
                     extraY = Math.max(-params.pupilLimitY, Math.min(params.pupilLimitY, extraY));
-                    // 总局部偏移 = 眼睛偏移 + 瞳孔额外偏移
-                    const totalLocalX = currentEyeX + extraX;
-                    const totalLocalY = currentEyeY + extraY;
-                    const totalWorld = rotateVector(totalLocalX, totalLocalY, currentHeadAngle);
+
+                    const pupilLocalX = currentEyeX + extraX;
+                    const pupilLocalY = currentEyeY + extraY;
+                    const pupilWorld = rotateVector(pupilLocalX, pupilLocalY, totalAngle);
+
                     return {
-                        pivotX: params.headPivotX,
-                        pivotY: params.headPivotY,
-                        angle: currentHeadAngle,
-                        offX: currentHeadX + totalWorld.x,
-                        offY: currentHeadY + totalWorld.y
+                        pivotX: params.headPivotX + pivotDelta.x,
+                        pivotY: params.headPivotY + pivotDelta.y,
+                        angle: totalAngle,
+                        offX: pivotDelta.x + currentHeadX + pupilWorld.x,
+                        offY: pivotDelta.y + currentHeadY + pupilWorld.y
                     };
                 }
+
                 default:
                     return { pivotX: 0, pivotY: 0, angle: 0, offX: 0, offY: 0 };
             }
@@ -429,24 +446,30 @@
                 }
             }
 
-            // 调试：绘制眼眶边界与旋转中心
             if (params.debug) {
                 const eyeT = getLayerTransform('eye');
                 const pupilT = getLayerTransform('pupil');
                 const ew = layerPositions.eyewhite;
                 const ir = layerPositions.irides;
 
-                // 绘制旋转中心
-                ctx.fillStyle = '#ff0';
-                ctx.beginPath();
-                ctx.arc(params.headPivotX, params.headPivotY, 4, 0, Math.PI*2);
-                ctx.fill();
+                // 身体旋转中心
                 ctx.fillStyle = '#0ff';
                 ctx.beginPath();
-                ctx.arc(params.bodyPivotX, params.bodyPivotY, 4, 0, Math.PI*2);
+                ctx.arc(params.bodyPivotX, params.bodyPivotY, 5, 0, Math.PI*2);
                 ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.font = '11px sans-serif';
+                ctx.fillText('bodyPivot', params.bodyPivotX + 8, params.bodyPivotY + 4);
 
-                // eyewhite 边界（在世界坐标系中）
+                // 头部旋转中心（已被身体旋转带到新位置）
+                ctx.fillStyle = '#ff0';
+                ctx.beginPath();
+                ctx.arc(eyeT.pivotX, eyeT.pivotY, 5, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.fillText('headPivot', eyeT.pivotX + 8, eyeT.pivotY + 4);
+
+                // eyewhite 边界
                 ctx.save();
                 ctx.translate(eyeT.pivotX + eyeT.offX, eyeT.pivotY + eyeT.offY);
                 ctx.rotate(eyeT.angle);
@@ -463,11 +486,6 @@
                 ctx.lineWidth = 2;
                 ctx.strokeRect(ir.x - pupilT.pivotX, ir.y - pupilT.pivotY, ir.w, ir.h);
                 ctx.restore();
-
-                ctx.fillStyle = '#fff';
-                ctx.font = '12px sans-serif';
-                ctx.fillText('headPivot', params.headPivotX + 6, params.headPivotY);
-                ctx.fillText('bodyPivot', params.bodyPivotX + 6, params.bodyPivotY);
             }
         }
 
