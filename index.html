@@ -123,32 +123,18 @@
                 <input type="range" id="r-bang" min="0" max="10" step="0.5" value="2">
             </div>
             <div class="cfg-row">
-                <div class="cfg-label">
-                    <span>颈部跟随头部</span>
-                    <span style="display:flex;align-items:center;gap:4px;">
-                        <input type="number" id="n-ninf" value="85" min="0" max="100" step="1"
-                               style="width:44px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#6ec3ff;padding:2px 4px;font-size:12px;text-align:center;outline:none;">
-                        <span class="cfg-val" id="v-ninf">%</span>
-                    </span>
-                </div>
+                <div class="cfg-label"><span>腿部弯曲强度</span><span class="cfg-val" id="v-legb">60%</span></div>
+                <input type="range" id="r-legb" min="0" max="100" step="5" value="60">
+                <div class="cfg-hint">仿射变换倾斜+压缩模拟膝盖弯曲，0=无弯曲</div>
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>颈部跟随头部</span><span class="cfg-val" id="v-ninf">85%</span></div>
+                <span style="display:flex;align-items:center;gap:4px;">
+                    <input type="number" id="n-ninf" value="85" min="0" max="100" step="1"
+                           style="width:44px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:4px;color:#6ec3ff;padding:2px 4px;font-size:12px;text-align:center;outline:none;">
+                    <span class="cfg-val">%</span>
+                </span>
                 <input type="range" id="r-ninf" min="0" max="100" step="1" value="85">
-                <div class="cfg-hint">颈部受头部运动影响的比例，0=完全固定，100=完全跟随</div>
-            </div>
-            <div class="cfg-row">
-                <div class="cfg-label"><span>头部旋转中心 X</span><span class="cfg-val" id="v-hpx">640</span></div>
-                <input type="range" id="r-hpx" min="500" max="800" step="5" value="640">
-            </div>
-            <div class="cfg-row">
-                <div class="cfg-label"><span>头部旋转中心 Y</span><span class="cfg-val" id="v-hpy">330</span></div>
-                <input type="range" id="r-hpy" min="200" max="500" step="5" value="330">
-            </div>
-            <div class="cfg-row">
-                <div class="cfg-label"><span>身体旋转中心 X</span><span class="cfg-val" id="v-bpx">680</span></div>
-                <input type="range" id="r-bpx" min="500" max="900" step="5" value="680">
-            </div>
-            <div class="cfg-row">
-                <div class="cfg-label"><span>身体旋转中心 Y</span><span class="cfg-val" id="v-bpy">850</span></div>
-                <input type="range" id="r-bpy" min="600" max="1100" step="5" value="850">
             </div>
 
             <div class="cfg-sep"></div>
@@ -191,8 +177,8 @@
         const layerConfigs = [
             { name: 'back_hair',   filename: 'layers/back_hair.png',   group: 'head' },
             { name: 'bottomwear',  filename: 'layers/bottomwear.png',  group: 'body' },
-            { name: 'legwear',     filename: 'layers/legwear.png',     group: 'body' },
-            { name: 'footwear',    filename: 'layers/footwear.png',    group: 'body' },
+            { name: 'legwear',     filename: 'layers/legwear.png',     group: 'leg' },
+            { name: 'footwear',    filename: 'layers/footwear.png',    group: 'leg' },
             { name: 'topwear',     filename: 'layers/topwear.png',     group: 'body' },
             { name: 'neck',        filename: 'layers/neck.png',        group: 'neck' },
             { name: 'objects',     filename: 'layers/objects.png',     group: 'prop' },
@@ -240,6 +226,7 @@
             maxPupilMove: 3,
             maxHeadAngle: 6,
             maxBodyAngle: 2,
+            legBendFactor: 0.6,
             neckHeadInfluence: 0.85,
             headPivotX: 640,
             headPivotY: 330,
@@ -258,6 +245,7 @@
         function bindParam(id, key, fmt = v => v, suffix = '') {
             const el = document.getElementById('r-' + id);
             const disp = document.getElementById('v-' + id);
+            if (!el || !disp) return;
             el.addEventListener('input', () => {
                 const v = parseFloat(el.value);
                 params[key] = v;
@@ -269,6 +257,12 @@
         bindParam('pupil', 'maxPupilMove');
         bindParam('hang',  'maxHeadAngle',  v => v, '°');
         bindParam('bang',  'maxBodyAngle',  v => v, '°');
+        bindParam('legb',  'legBendFactor', v => Math.round(v * 100), '%');
+        bindParam('lhead', 'lerpHead',      v => v.toFixed(2));
+        bindParam('leye',  'lerpEye',       v => v.toFixed(2));
+        bindParam('px',    'pupilLimitX');
+        bindParam('py',    'pupilLimitY');
+
         // 颈部跟随：滑块 + 数字输入联动
         const rNinf = document.getElementById('r-ninf');
         const nNinf = document.getElementById('n-ninf');
@@ -281,14 +275,6 @@
         rNinf.addEventListener('input', () => setNeckInf(parseInt(rNinf.value)));
         nNinf.addEventListener('input', () => setNeckInf(parseInt(nNinf.value) || 0));
         nNinf.addEventListener('blur', () => setNeckInf(parseInt(nNinf.value) || 0));
-        bindParam('hpx',   'headPivotX');
-        bindParam('hpy',   'headPivotY');
-        bindParam('bpx',   'bodyPivotX');
-        bindParam('bpy',   'bodyPivotY');
-        bindParam('lhead', 'lerpHead',      v => v.toFixed(2));
-        bindParam('leye',  'lerpEye',       v => v.toFixed(2));
-        bindParam('px',    'pupilLimitX');
-        bindParam('py',    'pupilLimitY');
 
         document.getElementById('c-debug').addEventListener('change', e => {
             params.debug = e.target.checked;
@@ -361,7 +347,7 @@
             currentEyeY = lerp(currentEyeY, targetEyeY, params.lerpEye);
         }
 
-        // 计算某点围绕身体旋转中心旋转后的位移（不是新坐标，是位移量）
+        // 计算某点围绕身体旋转中心旋转后的位移
         function getBodyRotDelta(px, py) {
             const dx = px - params.bodyPivotX;
             const dy = py - params.bodyPivotY;
@@ -394,13 +380,26 @@
                     };
                 }
 
+                case 'leg': {
+                    const bend = params.legBendFactor;
+                    // 腿部仿射变换：旋转 + 倾斜 + 压缩
+                    // skewX 模拟膝盖弯曲时的透视（远离旋转中心的部分偏移更大）
+                    const skewX = -currentBodyAngle * bend;
+                    const scaleY = 1 - Math.abs(currentBodyAngle) * bend * 0.2;
+                    return {
+                        pivotX: params.bodyPivotX,
+                        pivotY: params.bodyPivotY,
+                        angle: currentBodyAngle,
+                        skewX,
+                        scaleY,
+                        offX: 0, offY: 0
+                    };
+                }
+
                 case 'neck': {
                     const inf = params.neckHeadInfluence;
-                    // 颈部旋转 = 身体旋转 + 头部独立旋转 * 影响系数
                     const neckAngle = currentBodyAngle + currentHeadAngle * inf;
-                    // 头部旋转中心被身体带到的新位置
                     const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
-                    // 颈部平移 = 身体位移 + 头部独立平移 * 影响系数
                     return {
                         pivotX: params.headPivotX + pivotDelta.x,
                         pivotY: params.headPivotY + pivotDelta.y,
@@ -411,11 +410,8 @@
                 }
 
                 case 'head': {
-                    // 头部总角度 = 身体角度 + 头部独立角度
                     const totalAngle = currentBodyAngle + currentHeadAngle;
-                    // 头部旋转中心先被身体旋转带到新位置
                     const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
-                    // 头部的世界坐标平移 = 身体带来的位移 + 头部独立平移
                     return {
                         pivotX: params.headPivotX + pivotDelta.x,
                         pivotY: params.headPivotY + pivotDelta.y,
@@ -428,7 +424,6 @@
                 case 'eye': {
                     const totalAngle = currentBodyAngle + currentHeadAngle;
                     const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
-                    // 眼睛偏移在头部局部坐标系中，需旋转到世界坐标
                     const eyeWorld = rotateVector(currentEyeX, currentEyeY, totalAngle);
                     return {
                         pivotX: params.headPivotX + pivotDelta.x,
@@ -476,15 +471,15 @@
                 const t = getLayerTransform(cfg.group);
                 if (!img || !pos) continue;
 
-                if (t.angle === 0) {
-                    ctx.drawImage(img, pos.x + t.offX, pos.y + t.offY, pos.w, pos.h);
-                } else {
-                    ctx.save();
-                    ctx.translate(t.pivotX + t.offX, t.pivotY + t.offY);
-                    ctx.rotate(t.angle);
-                    ctx.drawImage(img, pos.x - t.pivotX, pos.y - t.pivotY, pos.w, pos.h);
-                    ctx.restore();
+                ctx.save();
+                ctx.translate(t.pivotX + t.offX, t.pivotY + t.offY);
+                ctx.rotate(t.angle);
+                // 腿部仿射变换：倾斜 + 压缩
+                if (t.skewX !== undefined) {
+                    ctx.transform(1, 0, t.skewX, t.scaleY, 0, 0);
                 }
+                ctx.drawImage(img, pos.x - t.pivotX, pos.y - t.pivotY, pos.w, pos.h);
+                ctx.restore();
             }
 
             if (params.debug) {
@@ -493,7 +488,6 @@
                 const ew = layerPositions.eyewhite;
                 const ir = layerPositions.irides;
 
-                // 身体旋转中心
                 ctx.fillStyle = '#0ff';
                 ctx.beginPath();
                 ctx.arc(params.bodyPivotX, params.bodyPivotY, 5, 0, Math.PI*2);
@@ -502,7 +496,6 @@
                 ctx.font = '11px sans-serif';
                 ctx.fillText('bodyPivot', params.bodyPivotX + 8, params.bodyPivotY + 4);
 
-                // 头部旋转中心（已被身体旋转带到新位置）
                 ctx.fillStyle = '#ff0';
                 ctx.beginPath();
                 ctx.arc(eyeT.pivotX, eyeT.pivotY, 5, 0, Math.PI*2);
@@ -510,7 +503,6 @@
                 ctx.fillStyle = '#fff';
                 ctx.fillText('headPivot', eyeT.pivotX + 8, eyeT.pivotY + 4);
 
-                // eyewhite 边界
                 ctx.save();
                 ctx.translate(eyeT.pivotX + eyeT.offX, eyeT.pivotY + eyeT.offY);
                 ctx.rotate(eyeT.angle);
@@ -519,7 +511,6 @@
                 ctx.strokeRect(ew.x - eyeT.pivotX, ew.y - eyeT.pivotY, ew.w, ew.h);
                 ctx.restore();
 
-                // irides 边界
                 ctx.save();
                 ctx.translate(pupilT.pivotX + pupilT.offX, pupilT.pivotY + pupilT.offY);
                 ctx.rotate(pupilT.angle);
