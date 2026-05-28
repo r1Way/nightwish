@@ -192,14 +192,15 @@
 
         // 图层配置（绘制顺序：从后到前）
         const layerConfigs = [
+            { name: 'chair',       filename: 'layers/chair.png',       group: 'prop' },
             { name: 'back_hair',   filename: 'layers/back_hair.png',   group: 'head' },
             { name: 'bottomwear',  filename: 'layers/bottomwear.png',  group: 'body' },
             { name: 'legwear',     filename: 'layers/legwear.png',     group: 'leg' },
             { name: 'footwear',    filename: 'layers/footwear.png',    group: 'leg' },
             { name: 'topwear',     filename: 'layers/topwear.png',     group: 'body' },
             { name: 'neck',        filename: 'layers/neck.png',        group: 'neck' },
-            { name: 'objects',     filename: 'layers/objects.png',     group: 'prop' },
             { name: 'handwear',    filename: 'layers/handwear.png',    group: 'body' },
+            { name: 'table',       filename: 'layers/table.png',       group: 'prop' },
             { name: 'ears',        filename: 'layers/ears.png',        group: 'head' },
             { name: 'face',        filename: 'layers/face.png',        group: 'head' },
             { name: 'eyewhite',    filename: 'layers/eyewhite.png',    group: 'eye' },
@@ -213,7 +214,8 @@
         ];
 
         const layerPositions = {
-            objects:     { x: 160,  y: 470,  w: 960, h: 810 },
+            chair:       { x: 482,  y: 499,  w: 469, h: 779 },
+            table:       { x: 160,  y: 470,  w: 823, h: 810 },
             bottomwear:  { x: 511,  y: 728,  w: 338, h: 152 },
             legwear:     { x: 391,  y: 724,  w: 429, h: 456 },
             footwear:    { x: 291,  y: 1114, w: 362, h: 166 },
