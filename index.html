@@ -340,7 +340,7 @@
         // ========== 桌宠拖动支持 ==========
         if (IS_DESKPET) {
             let isDragging = false;
-            canvas.addEventListener('mousedown', e => {
+            window.addEventListener('mousedown', e => {
                 // 只有左键且不在配置面板上时才触发拖动
                 if (e.button === 0 && !e.target.closest('#config-panel')) {
                     isDragging = true;
@@ -354,7 +354,8 @@
                 }
             });
             // 右键菜单
-            canvas.addEventListener('contextmenu', e => {
+            window.addEventListener('contextmenu', e => {
+                if (e.target.closest('#config-panel')) return;
                 e.preventDefault();
                 document.title = '';
                 document.title = 'DP:CONTEXT_MENU';
@@ -584,9 +585,14 @@
         }
 
         function resizeCanvas() {
-            const size = Math.min(window.innerWidth, window.innerHeight);
-            canvas.style.width = size + 'px';
-            canvas.style.height = size + 'px';
+            if (IS_DESKPET) {
+                canvas.style.width = window.innerWidth + 'px';
+                canvas.style.height = window.innerHeight + 'px';
+            } else {
+                const size = Math.min(window.innerWidth, window.innerHeight);
+                canvas.style.width = size + 'px';
+                canvas.style.height = size + 'px';
+            }
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
