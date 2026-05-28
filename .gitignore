@@ -2,3 +2,10 @@
 export_layers.py
 preview_512.png
 original.png
+
+*.exe
+__pycache__/
+build/
+dist/
+*.spec
+
