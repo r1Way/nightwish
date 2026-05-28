@@ -351,6 +351,12 @@
                     document.title = 'DP:DRAG_END';
                 }
             });
+            // 右键菜单
+            canvas.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                document.title = '';
+                document.title = 'DP:CONTEXT_MENU';
+            });
         }
 
         function lerp(a, b, t) { return a + (b - a) * t; }
