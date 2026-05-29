@@ -438,12 +438,8 @@
                     document.title = 'DP:DRAG_END';
                 }
             });
-            // 右键菜单
-            window.addEventListener('contextmenu', e => {
-                if (e.target.closest('#config-panel')) return;
-                e.preventDefault();
-                document.title = 'DP:CONTEXT_MENU_' + Date.now();
-            });
+            // 右键菜单已由 Python 端 WebView.contextMenuEvent 统一处理，
+            // 此处不再拦截，避免与 Qt 默认行为冲突
         }
 
         function lerp(a, b, t) { return a + (b - a) * t; }

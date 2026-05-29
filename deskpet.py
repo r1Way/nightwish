@@ -16,6 +16,17 @@ from PySide6.QtGui import QCursor, QAction
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
+class WebView(QWebEngineView):
+    def __init__(self, deskpet, parent=None):
+        super().__init__(parent)
+        self.deskpet = deskpet
+
+    def contextMenuEvent(self, event):
+        # 直接显示自定义菜单，不使用浏览器默认菜单
+        event.accept()
+        self.deskpet.show_context_menu(self.mapToGlobal(event.pos()))
+
+
 class DeskPet(QWidget):
     def __init__(self):
         super().__init__()
@@ -31,7 +42,7 @@ class DeskPet(QWidget):
         self.setAttribute(Qt.WA_NoSystemBackground)
 
         # ========== WebView ==========
-        self.webview = QWebEngineView(self)
+        self.webview = WebView(self, self)
         self.webview.setAttribute(Qt.WA_TranslucentBackground)
         self.webview.page().setBackgroundColor(Qt.transparent)
 
@@ -145,7 +156,8 @@ class DeskPet(QWidget):
             self._dragging = False
             self._drag_start_global = None
             self._window_start_pos = None
-        elif title.startswith("DP:CONTEXT_MENU"):
+        elif title == "DP:CONTEXT_MENU":
+            # 保留兼容，但实际右键已由 WebView.contextMenuEvent 处理
             self.show_context_menu(QCursor.pos())
 
     # ========== 键盘退出 ==========
