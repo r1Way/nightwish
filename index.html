@@ -545,14 +545,16 @@
                 }
 
                 case 'hand': {
-                    const writeX = Math.sin(animTime * 3.5) * 2.0;
-                    const writeY = Math.cos(animTime * 2.8) * 1.5;
+                    const wiggleX = Math.sin(animTime * 2.5) * 0.5;
+                    const wiggleY = Math.cos(animTime * 2.0) * 0.3;
                     return {
                         pivotX: params.bodyPivotX,
                         pivotY: params.bodyPivotY,
                         angle: currentBodyAngle,
-                        offX: writeX,
-                        offY: writeY
+                        offX: 0,
+                        offY: 0,
+                        wiggleX,
+                        wiggleY
                     };
                 }
 
@@ -581,6 +583,10 @@
                 ctx.save();
                 ctx.translate(t.pivotX + t.offX, t.pivotY + t.offY);
                 ctx.rotate(t.angle);
+                // 手部局部微动（在旋转后应用，沿自身方向）
+                if (t.wiggleX !== undefined) {
+                    ctx.translate(t.wiggleX, t.wiggleY);
+                }
                 // 腿部仿射变换：倾斜 + 压缩
                 if (t.skewX !== undefined) {
                     ctx.transform(1, 0, t.skewX, t.scaleY, 0, 0);
