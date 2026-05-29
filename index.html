@@ -44,19 +44,18 @@
         }
         #config-header {
             padding: 12px 14px; cursor: pointer;
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex; align-items: center;
+            gap: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
             user-select: none;
-            position: relative;
         }
         #config-header:hover { background: rgba(255,255,255,0.04); }
-        #config-header h3 { font-size: 14px; font-weight: 600; color: #fff; }
-        #config-toggle { transition: transform 0.2s; font-size: 12px; }
+        #config-header h3 { flex: 1; font-size: 14px; font-weight: 600; color: #fff; }
+        #config-toggle { transition: transform 0.2s; font-size: 12px; cursor: pointer; }
         #config-panel.collapsed #config-toggle { transform: rotate(-90deg); }
         #config-panel.collapsed #config-body { display: none; }
         #config-panel.hidden { display: none !important; }
         #config-close {
-            position: absolute; top: 8px; right: 10px;
             width: 20px; height: 20px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; border-radius: 4px;
