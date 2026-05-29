@@ -154,6 +154,19 @@
             </div>
 
             <div class="cfg-sep"></div>
+            <div class="cfg-group-title">手部</div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>手部摆动角度</span><span class="cfg-val" id="v-hwa">3°</span></div>
+                <input type="range" id="r-hwa" min="0" max="10" step="0.5" value="3">
+                <div class="cfg-hint">围绕肩膀连接处的旋转摆动幅度</div>
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>手部剪切强度</span><span class="cfg-val" id="v-hws">0.10</span></div>
+                <input type="range" id="r-hws" min="0" max="0.5" step="0.01" value="0.10">
+                <div class="cfg-hint">模拟手臂前后摆动的透视变形</div>
+            </div>
+
+            <div class="cfg-sep"></div>
             <div class="cfg-group-title">平滑</div>
             <div class="cfg-row">
                 <div class="cfg-label"><span>头部/身体平滑</span><span class="cfg-val" id="v-lhead">0.08</span></div>
@@ -271,6 +284,8 @@
             lerpEye: 0.12,
             pupilLimitX: 5,
             pupilLimitY: 0,
+            maxHandWiggleAngle: 3,
+            maxHandWiggleSkew: 0.10,
             debug: false
         };
 
@@ -293,6 +308,14 @@
         bindParam('hup',  'maxHeadUpAngle',  v => v, '°');
         bindParam('hdn',  'maxHeadDownAngle', v => v, '°');
         bindParam('bang',  'maxBodyAngle',  v => v, '°');
+        bindParam('hwa',  'maxHandWiggleAngle', v => v, '°');
+        const rHws = document.getElementById('r-hws');
+        const vHws = document.getElementById('v-hws');
+        rHws.addEventListener('input', () => {
+            const v = parseFloat(rHws.value);
+            params.maxHandWiggleSkew = v;
+            vHws.textContent = v.toFixed(2);
+        });
         // 腿部弯曲：滑块值 0~100，实际参数 0~1
         const rLegb = document.getElementById('r-legb');
         const vLegb = document.getElementById('v-legb');
@@ -449,7 +472,7 @@
             return { x: vx * c - vy * s, y: vx * s + vy * c };
         }
 
-        function getLayerTransform(group) {
+        function getLayerTransform(group, name = '') {
             switch (group) {
                 case 'prop':
                     return { pivotX: 0, pivotY: 0, angle: 0, offX: 0, offY: 0 };
@@ -545,16 +568,26 @@
                 }
 
                 case 'hand': {
-                    const wiggleX = Math.sin(animTime * 2.5) * 0.5;
-                    const wiggleY = Math.cos(animTime * 2.0) * 0.3;
+                    // 左右手使用不同的连接处（肩膀位置）
+                    const localPivotX = name.includes('right') ? 760 : 600;
+                    const localPivotY = 380;
+                    const localDX = localPivotX - params.bodyPivotX;
+                    const localDY = localPivotY - params.bodyPivotY;
+                    const wigglePhase = animTime * 2.5;
+                    const localAngle = Math.sin(wigglePhase) * params.maxHandWiggleAngle * D2R;
+                    const localSkewX = Math.sin(wigglePhase * 1.3) * params.maxHandWiggleSkew;
                     return {
                         pivotX: params.bodyPivotX,
                         pivotY: params.bodyPivotY,
                         angle: currentBodyAngle,
                         offX: 0,
                         offY: 0,
-                        wiggleX,
-                        wiggleY
+                        localDX,
+                        localDY,
+                        localPivotX,
+                        localPivotY,
+                        localAngle,
+                        localSkewX
                     };
                 }
 
@@ -577,21 +610,29 @@
             for (const cfg of layerConfigs) {
                 const img = images[cfg.name];
                 const pos = layerPositions[cfg.name];
-                const t = getLayerTransform(cfg.group);
+                const t = getLayerTransform(cfg.group, cfg.name);
                 if (!img || !pos) continue;
 
                 ctx.save();
-                ctx.translate(t.pivotX + t.offX, t.pivotY + t.offY);
-                ctx.rotate(t.angle);
-                // 手部局部微动（在旋转后应用，沿自身方向）
-                if (t.wiggleX !== undefined) {
-                    ctx.translate(t.wiggleX, t.wiggleY);
+                if (cfg.group === 'hand') {
+                    // hand 组：先身体变换，再围绕连接处局部变换
+                    ctx.translate(t.pivotX + t.offX, t.pivotY + t.offY);
+                    ctx.rotate(t.angle);
+                    ctx.translate(t.localDX, t.localDY);
+                    ctx.rotate(t.localAngle);
+                    if (t.localSkewX !== 0) {
+                        ctx.transform(1, 0, t.localSkewX, 1, 0, 0);
+                    }
+                    ctx.drawImage(img, pos.x - t.localPivotX, pos.y - t.localPivotY, pos.w, pos.h);
+                } else {
+                    ctx.translate(t.pivotX + t.offX, t.pivotY + t.offY);
+                    ctx.rotate(t.angle);
+                    // 腿部仿射变换：倾斜 + 压缩
+                    if (t.skewX !== undefined) {
+                        ctx.transform(1, 0, t.skewX, t.scaleY, 0, 0);
+                    }
+                    ctx.drawImage(img, pos.x - t.pivotX, pos.y - t.pivotY, pos.w, pos.h);
                 }
-                // 腿部仿射变换：倾斜 + 压缩
-                if (t.skewX !== undefined) {
-                    ctx.transform(1, 0, t.skewX, t.scaleY, 0, 0);
-                }
-                ctx.drawImage(img, pos.x - t.pivotX, pos.y - t.pivotY, pos.w, pos.h);
                 ctx.restore();
             }
 
