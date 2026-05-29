@@ -197,51 +197,57 @@
 
         // 图层配置（绘制顺序：从后到前）
         const layerConfigs = [
-            { name: 'chair',       filename: 'layers/chair.png',       group: 'prop' },
-            { name: 'back_hair',   filename: 'layers/back_hair.png',   group: 'head' },
-            { name: 'legwear',     filename: 'layers/legwear.png',     group: 'leg' },
-            { name: 'bottomwear',  filename: 'layers/bottomwear.png',  group: 'body' },
-            { name: 'footwear',    filename: 'layers/footwear.png',    group: 'leg' },
-            { name: 'topwear',     filename: 'layers/topwear.png',     group: 'body' },
-            { name: 'neck',        filename: 'layers/neck.png',        group: 'neck' },
-            { name: 'handwear',    filename: 'layers/handwear.png',    group: 'body' },
-            { name: 'pen',         filename: 'layers/pen.png',         group: 'prop' },
-            { name: 'table2',      filename: 'layers/table2.png',      group: 'prop' },
-            { name: 'ears',        filename: 'layers/ears.png',        group: 'head' },
-            { name: 'face',        filename: 'layers/face.png',        group: 'head' },
-            { name: 'eyewhite',    filename: 'layers/eyewhite.png',    group: 'eye' },
-            { name: 'irides',      filename: 'layers/irides.png',      group: 'pupil' },
-            { name: 'eyelash',     filename: 'layers/eyelash.png',     group: 'eye' },
-            { name: 'eyebrow',     filename: 'layers/eyebrow.png',     group: 'eye' },
-            { name: 'nose',        filename: 'layers/nose.png',        group: 'eye' },
-            { name: 'mouth',       filename: 'layers/mouth.png',       group: 'eye' },
-            { name: 'front_hair',  filename: 'layers/front_hair.png',  group: 'head' },
-            { name: 'headwear',    filename: 'layers/headwear.png',    group: 'head' },
-            { name: 'book',        filename: 'layers/book.png',        group: 'prop' },
+            { name: 'chair',           filename: 'layers/chair.png',           group: 'prop' },
+            { name: 'back_hair',       filename: 'layers/back_hair.png',       group: 'head' },
+            { name: 'table_back',      filename: 'layers/table_back.png',      group: 'prop' },
+            { name: 'legwear',         filename: 'layers/legwear.png',         group: 'leg' },
+            { name: 'bottomwear',      filename: 'layers/bottomwear.png',      group: 'body' },
+            { name: 'footwear',        filename: 'layers/footwear.png',        group: 'leg' },
+            { name: 'topwear',         filename: 'layers/topwear.png',         group: 'body' },
+            { name: 'neck',            filename: 'layers/neck.png',            group: 'neck' },
+            { name: 'left_hand',       filename: 'layers/left_hand.png',       group: 'hand' },
+            { name: 'pen',             filename: 'layers/pen.png',             group: 'hand' },
+            { name: 'left_hand_front', filename: 'layers/left_hand_front.png', group: 'hand' },
+            { name: 'right_hand',      filename: 'layers/right_hand.png',      group: 'hand' },
+            { name: 'table3',          filename: 'layers/table3.png',          group: 'prop' },
+            { name: 'ears',            filename: 'layers/ears.png',            group: 'head' },
+            { name: 'face',            filename: 'layers/face.png',            group: 'head' },
+            { name: 'eyewhite',        filename: 'layers/eyewhite.png',        group: 'eye' },
+            { name: 'irides',          filename: 'layers/irides.png',          group: 'pupil' },
+            { name: 'eyelash',         filename: 'layers/eyelash.png',         group: 'eye' },
+            { name: 'eyebrow',         filename: 'layers/eyebrow.png',         group: 'eye' },
+            { name: 'nose',            filename: 'layers/nose.png',            group: 'eye' },
+            { name: 'mouth',           filename: 'layers/mouth.png',           group: 'eye' },
+            { name: 'front_hair',      filename: 'layers/front_hair.png',      group: 'head' },
+            { name: 'headwear',        filename: 'layers/headwear.png',        group: 'head' },
+            { name: 'book',            filename: 'layers/book.png',            group: 'prop' },
         ];
 
         const layerPositions = {
-            chair:       { x: 482,  y: 499,  w: 469, h: 779 },
-            table2:      { x: 160,  y: 538,  w: 823, h: 742 },
-            pen:         { x: 448,  y: 482,  w: 44,  h: 121 },
-            book:        { x: 546,  y: 575,  w: 295, h: 120 },
-            bottomwear:  { x: 511,  y: 728,  w: 338, h: 152 },
-            legwear:     { x: 391,  y: 724,  w: 429, h: 456 },
-            footwear:    { x: 291,  y: 1114, w: 362, h: 166 },
-            topwear:     { x: 563,  y: 327,  w: 304, h: 470 },
-            handwear:    { x: 432,  y: 353,  w: 441, h: 260 },
-            back_hair:   { x: 518,  y: 99,   w: 269, h: 279 },
-            neck:        { x: 622,  y: 246,  w: 98,  h: 133 },
-            ears:        { x: 565,  y: 238,  w: 156, h: 72  },
-            face:        { x: 548,  y: 170,  w: 152, h: 177 },
-            eyewhite:    { x: 570,  y: 266,  w: 97,  h: 29  },
-            irides:      { x: 576,  y: 265,  w: 85,  h: 30  },
-            eyelash:     { x: 559,  y: 259,  w: 119, h: 38  },
-            eyebrow:     { x: 554,  y: 247,  w: 111, h: 16  },
-            nose:        { x: 601,  y: 298,  w: 9,   h: 17  },
-            mouth:       { x: 618,  y: 325,  w: 14,  h: 6   },
-            front_hair:  { x: 527,  y: 127,  w: 186, h: 224 },
-            headwear:    { x: 673,  y: 152,  w: 79,  h: 87  },
+            chair:           { x: 482,  y: 499,  w: 469, h: 779 },
+            table_back:      { x: 181,  y: 787,  w: 200, h: 447 },
+            table3:          { x: 160,  y: 538,  w: 823, h: 742 },
+            pen:             { x: 448,  y: 482,  w: 44,  h: 121 },
+            book:            { x: 546,  y: 575,  w: 295, h: 120 },
+            bottomwear:      { x: 511,  y: 728,  w: 338, h: 152 },
+            legwear:         { x: 391,  y: 724,  w: 429, h: 456 },
+            footwear:        { x: 291,  y: 1114, w: 362, h: 166 },
+            topwear:         { x: 563,  y: 327,  w: 304, h: 470 },
+            left_hand:       { x: 432,  y: 353,  w: 183, h: 247 },
+            left_hand_front: { x: 445,  y: 538,  w: 56,  h: 57  },
+            right_hand:      { x: 542,  y: 353,  w: 331, h: 260 },
+            back_hair:       { x: 518,  y: 99,   w: 269, h: 279 },
+            neck:            { x: 622,  y: 246,  w: 98,  h: 133 },
+            ears:            { x: 565,  y: 238,  w: 156, h: 72  },
+            face:            { x: 548,  y: 170,  w: 152, h: 177 },
+            eyewhite:        { x: 570,  y: 266,  w: 97,  h: 29  },
+            irides:          { x: 576,  y: 265,  w: 85,  h: 30  },
+            eyelash:         { x: 559,  y: 259,  w: 119, h: 38  },
+            eyebrow:         { x: 554,  y: 247,  w: 111, h: 16  },
+            nose:            { x: 601,  y: 298,  w: 9,   h: 17  },
+            mouth:           { x: 618,  y: 325,  w: 14,  h: 6   },
+            front_hair:      { x: 527,  y: 127,  w: 186, h: 224 },
+            headwear:        { x: 673,  y: 152,  w: 79,  h: 87  },
         };
 
         const FACE_CENTER_X = 624;
@@ -338,6 +344,7 @@
         let targetBodyAngle = 0, currentBodyAngle = 0;
         let targetEyeX = 0, targetEyeY = 0;
         let currentEyeX = 0, currentEyeY = 0;
+        let animTime = 0;
 
         let images = {};
         let loadedCount = 0;
@@ -537,6 +544,18 @@
                     };
                 }
 
+                case 'hand': {
+                    const writeX = Math.sin(animTime * 3.5) * 2.0;
+                    const writeY = Math.cos(animTime * 2.8) * 1.5;
+                    return {
+                        pivotX: params.bodyPivotX,
+                        pivotY: params.bodyPivotY,
+                        angle: currentBodyAngle,
+                        offX: writeX,
+                        offY: writeY
+                    };
+                }
+
                 default:
                     return { pivotX: 0, pivotY: 0, angle: 0, offX: 0, offY: 0 };
             }
@@ -612,6 +631,7 @@
         }
 
         function animate() {
+            animTime = performance.now() / 1000;
             updateTargets();
             updateCurrent();
             draw();

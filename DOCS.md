@@ -33,26 +33,29 @@ img.save(f'{safe_name}.png')
 |------|---------|---------|
 | `head` | back_hair, ears, face, front_hair, headwear | 头部整体旋转+平移，与身体联动 |
 | `neck` | neck | 中间层：身体与头部的插值过渡 |
-| `body` | bottomwear, topwear, handwear | 围绕臀部旋转 |
+| `body` | bottomwear, topwear | 围绕臀部旋转 |
+| `hand` | left_hand, left_hand_front, right_hand, pen | 围绕臀部旋转 + 书写微动 |
 | `leg` | legwear, footwear | 围绕臀部旋转 + 仿射变换（模拟膝盖弯曲） |
 | `eye` | eyewhite, eyelash, eyebrow, nose, mouth | 跟随头部旋转，在局部坐标系中平移 |
 | `pupil` | irides | 跟随头部旋转，在眼白范围内限位移动 |
-| `prop` | objects（桌子） | 完全静止 |
+| `prop` | chair, table_back, table3, book | 完全静止 |
 
 ### 1.3 绘制顺序（Painter's Algorithm）
 
 从后到前依次绘制，确保遮挡关系正确：
 
 ```
-back_hair → bottomwear → legwear → footwear → topwear
-→ neck → objects → handwear → ears → face
-→ eyewhite → irides → eyelash → eyebrow → nose → mouth
-→ front_hair → headwear
+chair → back_hair → table_back → legwear → bottomwear → footwear → topwear
+→ neck → left_hand → pen → left_hand_front → right_hand → table3
+→ ears → face → eyewhite → irides → eyelash → eyebrow → nose → mouth
+→ front_hair → headwear → book
 ```
 
 关键遮挡关系：
-- `objects`（桌子）在 `legwear/bottomwear/footwear/topwear` **之后**绘制，遮挡下半身
-- `handwear`（手）在 `objects` **之后**绘制，手覆盖桌面物品
+- `table_back` 在腿部之前绘制，作为桌子后沿
+- `table3`（桌面）在 `legwear/bottomwear/footwear/topwear` 和双手 **之后**绘制，遮挡下半身和手部下方
+- `left_hand` → `pen` → `left_hand_front` 顺序确保笔被夹在手指之间
+- `right_hand` 在桌面之前绘制，覆盖桌面物品
 - `neck` 在 `topwear` **之后**绘制，脖子覆盖在衣服领口之上
 
 ---
@@ -368,8 +371,11 @@ params.neckHeadInfluence = parseInt(el.value) / 100;
 │   ├── footwear.png
 │   ├── topwear.png
 │   ├── neck.png
-│   ├── objects.png
-│   ├── handwear.png
+│   ├── table_back.png
+│   ├── table3.png
+│   ├── left_hand.png
+│   ├── left_hand_front.png
+│   ├── right_hand.png
 │   ├── ears.png
 │   ├── face.png
 │   ├── eyewhite.png

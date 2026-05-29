@@ -1,23 +1,33 @@
 [
   {
-    "name": "objects",
-    "filename": "objects.png",
-    "x": 160,
-    "y": 470,
-    "width": 960,
-    "height": 810,
-    "centerX": 640.0,
-    "centerY": 875.0
+    "name": "chair",
+    "filename": "chair.png",
+    "x": 482,
+    "y": 499,
+    "width": 469,
+    "height": 779,
+    "centerX": 716.5,
+    "centerY": 888.5
   },
   {
-    "name": "bottomwear",
-    "filename": "bottomwear.png",
-    "x": 511,
-    "y": 728,
-    "width": 338,
-    "height": 152,
-    "centerX": 680.0,
-    "centerY": 804.0
+    "name": "back_hair",
+    "filename": "back_hair.png",
+    "x": 518,
+    "y": 99,
+    "width": 269,
+    "height": 279,
+    "centerX": 652.5,
+    "centerY": 238.5
+  },
+  {
+    "name": "table_back",
+    "filename": "table_back.png",
+    "x": 181,
+    "y": 787,
+    "width": 200,
+    "height": 447,
+    "centerX": 281.0,
+    "centerY": 1010.5
   },
   {
     "name": "legwear",
@@ -30,14 +40,14 @@
     "centerY": 952.0
   },
   {
-    "name": "topwear",
-    "filename": "topwear.png",
-    "x": 563,
-    "y": 327,
-    "width": 304,
-    "height": 470,
-    "centerX": 715.0,
-    "centerY": 562.0
+    "name": "bottomwear",
+    "filename": "bottomwear.png",
+    "x": 511,
+    "y": 728,
+    "width": 338,
+    "height": 152,
+    "centerX": 680.0,
+    "centerY": 804.0
   },
   {
     "name": "footwear",
@@ -50,14 +60,14 @@
     "centerY": 1197.0
   },
   {
-    "name": "back hair",
-    "filename": "back_hair.png",
-    "x": 518,
-    "y": 99,
-    "width": 269,
-    "height": 279,
-    "centerX": 652.5,
-    "centerY": 238.5
+    "name": "topwear",
+    "filename": "topwear.png",
+    "x": 563,
+    "y": 327,
+    "width": 304,
+    "height": 470,
+    "centerX": 715.0,
+    "centerY": 562.0
   },
   {
     "name": "neck",
@@ -70,14 +80,54 @@
     "centerY": 312.5
   },
   {
-    "name": "handwear",
-    "filename": "handwear.png",
+    "name": "left_hand",
+    "filename": "left_hand.png",
     "x": 432,
     "y": 353,
-    "width": 441,
+    "width": 183,
+    "height": 247,
+    "centerX": 523.5,
+    "centerY": 476.5
+  },
+  {
+    "name": "pen",
+    "filename": "pen.png",
+    "x": 448,
+    "y": 482,
+    "width": 44,
+    "height": 121,
+    "centerX": 470.0,
+    "centerY": 542.5
+  },
+  {
+    "name": "left_hand_front",
+    "filename": "left_hand_front.png",
+    "x": 445,
+    "y": 538,
+    "width": 56,
+    "height": 57,
+    "centerX": 473.0,
+    "centerY": 566.5
+  },
+  {
+    "name": "right_hand",
+    "filename": "right_hand.png",
+    "x": 542,
+    "y": 353,
+    "width": 331,
     "height": 260,
-    "centerX": 652.5,
+    "centerX": 707.5,
     "centerY": 483.0
+  },
+  {
+    "name": "table3",
+    "filename": "table3.png",
+    "x": 160,
+    "y": 538,
+    "width": 823,
+    "height": 742,
+    "centerX": 571.5,
+    "centerY": 909.0
   },
   {
     "name": "ears",
@@ -100,14 +150,34 @@
     "centerY": 258.5
   },
   {
-    "name": "mouth",
-    "filename": "mouth.png",
-    "x": 618,
-    "y": 325,
-    "width": 14,
-    "height": 6,
-    "centerX": 625.0,
-    "centerY": 328.0
+    "name": "eyewhite",
+    "filename": "eyewhite.png",
+    "x": 570,
+    "y": 266,
+    "width": 97,
+    "height": 29,
+    "centerX": 618.5,
+    "centerY": 280.5
+  },
+  {
+    "name": "irides",
+    "filename": "irides.png",
+    "x": 576,
+    "y": 265,
+    "width": 85,
+    "height": 30,
+    "centerX": 618.5,
+    "centerY": 280.0
+  },
+  {
+    "name": "eyelash",
+    "filename": "eyelash.png",
+    "x": 559,
+    "y": 259,
+    "width": 119,
+    "height": 38,
+    "centerX": 618.5,
+    "centerY": 278.0
   },
   {
     "name": "eyebrow",
@@ -130,37 +200,17 @@
     "centerY": 306.5
   },
   {
-    "name": "eyewhite",
-    "filename": "eyewhite.png",
-    "x": 570,
-    "y": 266,
-    "width": 97,
-    "height": 29,
-    "centerX": 618.5,
-    "centerY": 280.5
+    "name": "mouth",
+    "filename": "mouth.png",
+    "x": 618,
+    "y": 325,
+    "width": 14,
+    "height": 6,
+    "centerX": 625.0,
+    "centerY": 328.0
   },
   {
-    "name": "eyelash",
-    "filename": "eyelash.png",
-    "x": 559,
-    "y": 259,
-    "width": 119,
-    "height": 38,
-    "centerX": 618.5,
-    "centerY": 278.0
-  },
-  {
-    "name": "irides",
-    "filename": "irides.png",
-    "x": 576,
-    "y": 265,
-    "width": 85,
-    "height": 30,
-    "centerX": 618.5,
-    "centerY": 280.0
-  },
-  {
-    "name": "front hair",
+    "name": "front_hair",
     "filename": "front_hair.png",
     "x": 527,
     "y": 127,
@@ -178,5 +228,15 @@
     "height": 87,
     "centerX": 712.5,
     "centerY": 195.5
+  },
+  {
+    "name": "book",
+    "filename": "book.png",
+    "x": 546,
+    "y": 575,
+    "width": 295,
+    "height": 120,
+    "centerX": 693.5,
+    "centerY": 635.0
   }
 ]
