@@ -126,8 +126,12 @@
             <div class="cfg-sep"></div>
             <div class="cfg-group-title">旋转</div>
             <div class="cfg-row">
-                <div class="cfg-label"><span>抬头/低头角度</span><span class="cfg-val" id="v-hang">10°</span></div>
-                <input type="range" id="r-hang" min="0" max="20" step="0.5" value="10">
+                <div class="cfg-label"><span>抬头角度</span><span class="cfg-val" id="v-hup">10°</span></div>
+                <input type="range" id="r-hup" min="0" max="20" step="0.5" value="10">
+            </div>
+            <div class="cfg-row">
+                <div class="cfg-label"><span>低头角度</span><span class="cfg-val" id="v-hdn">6°</span></div>
+                <input type="range" id="r-hdn" min="0" max="20" step="0.5" value="6">
             </div>
             <div class="cfg-row">
                 <div class="cfg-label"><span>身体左右转动</span><span class="cfg-val" id="v-bang">4°</span></div>
@@ -243,7 +247,8 @@
             maxHeadMove: 10,
             maxEyeMove: 5,
             maxPupilMove: 3,
-            maxHeadAngle: 10,
+            maxHeadUpAngle: 10,
+            maxHeadDownAngle: 6,
             maxBodyAngle: 4,
             legBendFactor: 0.25,
             neckHeadInfluence: 0.85,
@@ -274,7 +279,8 @@
         bindParam('head',  'maxHeadMove');
         bindParam('eye',   'maxEyeMove');
         bindParam('pupil', 'maxPupilMove');
-        bindParam('hang',  'maxHeadAngle',  v => v, '°');
+        bindParam('hup',  'maxHeadUpAngle',  v => v, '°');
+        bindParam('hdn',  'maxHeadDownAngle', v => v, '°');
         bindParam('bang',  'maxBodyAngle',  v => v, '°');
         // 腿部弯曲：滑块值 0~100，实际参数 0~1
         const rLegb = document.getElementById('r-legb');
@@ -394,7 +400,9 @@
             targetHeadY = off.y * params.maxHeadMove;
             // 头部角度：只响应垂直方向（抬头/低头）
             // 鼠标在上(off.y<0) → 顺时针旋转(正角度)抬头；在下 → 逆时针(负角度)低头
-            targetHeadAngle = -off.y * params.maxHeadAngle * D2R;
+            // 抬头(off.y<0)用 maxHeadUpAngle，低头(off.y>0)用 maxHeadDownAngle
+            const headAngleLimit = off.y < 0 ? params.maxHeadUpAngle : params.maxHeadDownAngle;
+            targetHeadAngle = -off.y * headAngleLimit * D2R;
             // 身体角度：只响应水平方向（左右转动）
             targetBodyAngle = off.x * params.maxBodyAngle * D2R;
             targetEyeX = off.x * params.maxEyeMove;
