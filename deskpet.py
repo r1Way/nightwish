@@ -100,6 +100,14 @@ class DeskPet(QWidget):
 
         menu.addSeparator()
 
+        flip_action = QAction("水平翻转", self)
+        flip_action.setCheckable(True)
+        flip_action.setChecked(self._is_flipped)
+        flip_action.triggered.connect(self.toggle_horizontal_flip)
+        menu.addAction(flip_action)
+
+        menu.addSeparator()
+
         quit_action = QAction("退出程序", self)
         quit_action.triggered.connect(self.close)
         menu.addAction(quit_action)
@@ -108,6 +116,11 @@ class DeskPet(QWidget):
 
     def toggle_config_panel(self):
         self.webview.page().runJavaScript("window.showConfigPanel && window.showConfigPanel();")
+
+    def toggle_horizontal_flip(self):
+        self._is_flipped = not self._is_flipped
+        js = f"window.setHorizontalFlip && window.setHorizontalFlip({str(self._is_flipped).lower()});"
+        self.webview.page().runJavaScript(js)
 
     def resize_to_percent(self, pct):
         """按基准尺寸 420px 的百分比调整窗口大小"""

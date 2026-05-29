@@ -397,6 +397,12 @@
         let targetRightHandAngle = 0, currentRightHandAngle = 0;
         let targetLeftHandSkew = 0, currentLeftHandSkew = 0;
         let targetRightHandSkew = 0, currentRightHandSkew = 0;
+        let isFlipped = false;
+
+        // 供 Python 调用切换水平翻转
+        window.setHorizontalFlip = function(flipped) {
+            isFlipped = flipped;
+        };
 
         let images = {};
         let loadedCount = 0;
@@ -447,8 +453,9 @@
             const rect = canvas.getBoundingClientRect();
             const scaleX = CANVAS_SIZE / rect.width;
             const scaleY = CANVAS_SIZE / rect.height;
-            const cx = (mouseX - rect.left) * scaleX;
+            let cx = (mouseX - rect.left) * scaleX;
             const cy = (mouseY - rect.top) * scaleY;
+            if (isFlipped) cx = CANVAS_SIZE - cx;
             const dx = cx - FACE_CENTER_X;
             const dy = cy - FACE_CENTER_Y;
             const maxDist = CANVAS_SIZE * 0.6;
@@ -642,6 +649,11 @@
             ctx.translate(CANVAS_SIZE / 2, CANVAS_SIZE / 2);
             ctx.scale(GLOBAL_SCALE, GLOBAL_SCALE);
             ctx.translate(-CANVAS_SIZE / 2, -CANVAS_SIZE / 2);
+
+            if (isFlipped) {
+                ctx.translate(CANVAS_SIZE, 0);
+                ctx.scale(-1, 1);
+            }
 
             for (const cfg of layerConfigs) {
                 const img = images[cfg.name];
