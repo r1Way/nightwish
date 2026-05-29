@@ -57,8 +57,8 @@ class DeskPet(QWidget):
         self._timer.timeout.connect(self._on_drag_tick)
         self._timer.start(16)
 
-        # 初始大小和位置（默认 100% = 1280×1280）
-        self.resize(1280, 1280)
+        # 初始大小和位置（默认 100% = 420×420，视觉上最舒适的基准尺寸）
+        self.resize(420, 420)
         screen = QApplication.primaryScreen().geometry()
         self.move(
             (screen.width() - self.width()) // 2,
@@ -113,8 +113,8 @@ class DeskPet(QWidget):
         """)
 
     def resize_to_percent(self, pct):
-        """按原始画布尺寸的百分比调整窗口大小"""
-        base = 1280
+        """按基准尺寸 420px 的百分比调整窗口大小"""
+        base = 420
         size = int(base * pct)
         self.resize(size, size)
 
