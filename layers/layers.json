@@ -120,8 +120,18 @@
     "centerY": 483.0
   },
   {
-    "name": "table3",
-    "filename": "table3.png",
+    "name": "table4_back",
+    "filename": "table4_back.png",
+    "x": 160,
+    "y": 538,
+    "width": 749,
+    "height": 742,
+    "centerX": 534.5,
+    "centerY": 909.0
+  },
+  {
+    "name": "table4_front",
+    "filename": "table4_front.png",
     "x": 160,
     "y": 538,
     "width": 823,

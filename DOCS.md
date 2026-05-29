@@ -38,24 +38,25 @@ img.save(f'{safe_name}.png')
 | `leg` | legwear, footwear | 围绕臀部旋转 + 仿射变换（模拟膝盖弯曲） |
 | `eye` | eyewhite, eyelash, eyebrow, nose, mouth | 跟随头部旋转，在局部坐标系中平移 |
 | `pupil` | irides | 跟随头部旋转，在眼白范围内限位移动 |
-| `prop` | chair, table_back, table3, book | 完全静止 |
+| `prop` | chair, table_back, table4_back, table4_front, book | 完全静止 |
 
 ### 1.3 绘制顺序（Painter's Algorithm）
 
 从后到前依次绘制，确保遮挡关系正确：
 
 ```
-chair → back_hair → table_back → legwear → bottomwear → footwear → topwear
-→ neck → left_hand → pen → left_hand_front → right_hand → table3
-→ ears → face → eyewhite → irides → eyelash → eyebrow → nose → mouth
-→ front_hair → headwear → book
+chair → back_hair → table_back → legwear → bottomwear → footwear
+→ table4_back → left_hand → topwear → neck → pen → left_hand_front
+→ right_hand → table4_front → book → ears → face → eyewhite → irides
+→ eyelash → eyebrow → nose → mouth → front_hair → headwear
 ```
 
 关键遮挡关系：
 - `table_back` 在腿部之前绘制，作为桌子后沿
-- `table3`（桌面）在 `legwear/bottomwear/footwear/topwear` 和双手 **之后**绘制，遮挡下半身和手部下方
+- `table4_back` 在腿部之后绘制，覆盖腿部下部
+- `table4_front` 在双手 **之后**绘制，遮挡手部下方
 - `left_hand` → `pen` → `left_hand_front` 顺序确保笔被夹在手指之间
-- `right_hand` 在桌面之前绘制，覆盖桌面物品
+- `right_hand` 在 `table4_front` 与 `book` 之间
 - `neck` 在 `topwear` **之后**绘制，脖子覆盖在衣服领口之上
 
 ---
@@ -372,7 +373,8 @@ params.neckHeadInfluence = parseInt(el.value) / 100;
 │   ├── topwear.png
 │   ├── neck.png
 │   ├── table_back.png
-│   ├── table3.png
+│   ├── table4_back.png
+│   ├── table4_front.png
 │   ├── left_hand.png
 │   ├── left_hand_front.png
 │   ├── right_hand.png
