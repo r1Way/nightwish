@@ -367,7 +367,8 @@
         let targetBodyAngle = 0, currentBodyAngle = 0;
         let targetEyeX = 0, targetEyeY = 0;
         let currentEyeX = 0, currentEyeY = 0;
-        let animTime = 0;
+        let targetHandAngle = 0, currentHandAngle = 0;
+        let targetHandSkew = 0, currentHandSkew = 0;
 
         let images = {};
         let loadedCount = 0;
@@ -442,6 +443,8 @@
             targetBodyAngle = off.x * params.maxBodyAngle * D2R;
             targetEyeX = off.x * params.maxEyeMove;
             targetEyeY = off.y * params.maxEyeMove;
+            targetHandAngle = off.x * params.maxHandWiggleAngle * D2R;
+            targetHandSkew = off.y * params.maxHandWiggleSkew;
         }
 
         function updateCurrent() {
@@ -451,6 +454,8 @@
             currentBodyAngle = lerp(currentBodyAngle, targetBodyAngle, params.lerpHead);
             currentEyeX = lerp(currentEyeX, targetEyeX, params.lerpEye);
             currentEyeY = lerp(currentEyeY, targetEyeY, params.lerpEye);
+            currentHandAngle = lerp(currentHandAngle, targetHandAngle, params.lerpHead);
+            currentHandSkew = lerp(currentHandSkew, targetHandSkew, params.lerpHead);
         }
 
         // 计算某点围绕身体旋转中心旋转后的位移
@@ -573,9 +578,6 @@
                     const localPivotY = 380;
                     const localDX = localPivotX - params.bodyPivotX;
                     const localDY = localPivotY - params.bodyPivotY;
-                    const wigglePhase = animTime * 2.5;
-                    const localAngle = Math.sin(wigglePhase) * params.maxHandWiggleAngle * D2R;
-                    const localSkewX = Math.sin(wigglePhase * 1.3) * params.maxHandWiggleSkew;
                     return {
                         pivotX: params.bodyPivotX,
                         pivotY: params.bodyPivotY,
@@ -586,8 +588,8 @@
                         localDY,
                         localPivotX,
                         localPivotY,
-                        localAngle,
-                        localSkewX
+                        localAngle: currentHandAngle,
+                        localSkewX: currentHandSkew
                     };
                 }
 
@@ -678,7 +680,6 @@
         }
 
         function animate() {
-            animTime = performance.now() / 1000;
             updateTargets();
             updateCurrent();
             draw();
