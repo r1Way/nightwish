@@ -63,6 +63,7 @@ class DeskPet(QWidget):
         self._dragging = False
         self._drag_start_global = None
         self._window_start_pos = None
+        self._is_flipped = False
 
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._on_drag_tick)
