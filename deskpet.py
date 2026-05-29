@@ -57,8 +57,8 @@ class DeskPet(QWidget):
         self._timer.timeout.connect(self._on_drag_tick)
         self._timer.start(16)
 
-        # 初始大小和位置
-        self.resize(420, 420)
+        # 初始大小和位置（默认 100% = 1280×1280）
+        self.resize(1280, 1280)
         screen = QApplication.primaryScreen().geometry()
         self.move(
             (screen.width() - self.width()) // 2,
@@ -109,7 +109,7 @@ class DeskPet(QWidget):
     def toggle_config_panel(self):
         self.webview.page().runJavaScript("""
             const panel = document.getElementById('config-panel');
-            if (panel) panel.classList.toggle('hidden');
+            if (panel) panel.classList.remove('hidden');
         """)
 
     def resize_to_percent(self, pct):

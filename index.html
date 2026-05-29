@@ -47,6 +47,7 @@
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid rgba(255,255,255,0.08);
             user-select: none;
+            position: relative;
         }
         #config-header:hover { background: rgba(255,255,255,0.04); }
         #config-header h3 { font-size: 14px; font-weight: 600; color: #fff; }
@@ -359,11 +360,11 @@
         });
 
         const panel = document.getElementById('config-panel');
-        document.getElementById('config-header').addEventListener('click', (e) => {
-            if (e.target.id === 'config-close') return;
+        document.getElementById('config-header').addEventListener('click', () => {
             panel.classList.toggle('collapsed');
         });
-        document.getElementById('config-close').addEventListener('click', () => {
+        document.getElementById('config-close').addEventListener('click', (e) => {
+            e.stopPropagation();
             panel.classList.add('hidden');
         });
 
