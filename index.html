@@ -366,7 +366,17 @@
         document.getElementById('config-close').addEventListener('click', (e) => {
             e.stopPropagation();
             panel.classList.add('hidden');
+            panel.style.setProperty('display', 'none', 'important');
         });
+
+        // 暴露给 Python 调用的显式显示函数
+        window.showConfigPanel = function() {
+            var p = document.getElementById('config-panel');
+            if (p) {
+                p.classList.remove('hidden');
+                p.style.setProperty('display', 'flex', 'important');
+            }
+        };
 
         // 状态
         let mouseX = window.innerWidth / 2;

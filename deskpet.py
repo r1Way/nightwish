@@ -107,10 +107,7 @@ class DeskPet(QWidget):
         menu.exec(global_pos)
 
     def toggle_config_panel(self):
-        self.webview.page().runJavaScript("""
-            const panel = document.getElementById('config-panel');
-            if (panel) panel.classList.remove('hidden');
-        """)
+        self.webview.page().runJavaScript("window.showConfigPanel && window.showConfigPanel();")
 
     def resize_to_percent(self, pct):
         """按基准尺寸 420px 的百分比调整窗口大小"""
