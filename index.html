@@ -392,21 +392,13 @@
             const off = getMouseOffset();
             targetHeadX = off.x * params.maxHeadMove;
             targetHeadY = off.y * params.maxHeadMove;
-            // 头部角度：只响应水平方向（左右转动）
-            targetHeadAngle = off.x * params.maxHeadAngle * D2R;
-            // 身体角度：主要响应水平方向，兼顾垂直方向
-            targetBodyAngle = (off.x * 0.7 - off.y * 0.3) * params.maxBodyAngle * D2R;
+            // 头部角度：只响应垂直方向（抬头/低头）
+            // 鼠标在上(off.y<0) → 顺时针旋转(正角度)抬头；在下 → 逆时针(负角度)低头
+            targetHeadAngle = -off.y * params.maxHeadAngle * D2R;
+            // 身体角度：只响应水平方向（左右转动）
+            targetBodyAngle = off.x * params.maxBodyAngle * D2R;
             targetEyeX = off.x * params.maxEyeMove;
             targetEyeY = off.y * params.maxEyeMove;
-        }
-
-        // 抬头/低头模拟：根据头部垂直偏移计算后仰/前倾的倾斜和缩放
-        function getHeadTilt() {
-            const f = -currentHeadY / (params.maxHeadMove || 10); // 正=抬头, 负=低头
-            return {
-                skewX: f * 0.22,
-                scaleY: 1 + f * 0.08
-            };
         }
 
         function updateCurrent() {
@@ -476,13 +468,10 @@
                     const inf = params.neckHeadInfluence;
                     const neckAngle = currentBodyAngle + currentHeadAngle * inf;
                     const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
-                    const tilt = getHeadTilt();
                     return {
                         pivotX: params.headPivotX + pivotDelta.x,
                         pivotY: params.headPivotY + pivotDelta.y,
                         angle: neckAngle,
-                        skewX: tilt.skewX * 0.5,
-                        scaleY: 1 + (tilt.scaleY - 1) * 0.5,
                         offX: pivotDelta.x + currentHeadX * inf,
                         offY: pivotDelta.y + currentHeadY * inf
                     };
@@ -491,13 +480,10 @@
                 case 'head': {
                     const totalAngle = currentBodyAngle + currentHeadAngle;
                     const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
-                    const tilt = getHeadTilt();
                     return {
                         pivotX: params.headPivotX + pivotDelta.x,
                         pivotY: params.headPivotY + pivotDelta.y,
                         angle: totalAngle,
-                        skewX: tilt.skewX,
-                        scaleY: tilt.scaleY,
                         offX: pivotDelta.x + currentHeadX,
                         offY: pivotDelta.y + currentHeadY
                     };
@@ -506,14 +492,11 @@
                 case 'eye': {
                     const totalAngle = currentBodyAngle + currentHeadAngle;
                     const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
-                    const tilt = getHeadTilt();
                     const eyeWorld = rotateVector(currentEyeX, currentEyeY, totalAngle);
                     return {
                         pivotX: params.headPivotX + pivotDelta.x,
                         pivotY: params.headPivotY + pivotDelta.y,
                         angle: totalAngle,
-                        skewX: tilt.skewX,
-                        scaleY: tilt.scaleY,
                         offX: pivotDelta.x + currentHeadX + eyeWorld.x,
                         offY: pivotDelta.y + currentHeadY + eyeWorld.y
                     };
@@ -522,7 +505,6 @@
                 case 'pupil': {
                     const totalAngle = currentBodyAngle + currentHeadAngle;
                     const pivotDelta = getBodyRotDelta(params.headPivotX, params.headPivotY);
-                    const tilt = getHeadTilt();
 
                     let extraX = (currentEyeX / (params.maxEyeMove || 1)) * params.maxPupilMove;
                     let extraY = (currentEyeY / (params.maxEyeMove || 1)) * params.maxPupilMove;
@@ -537,8 +519,6 @@
                         pivotX: params.headPivotX + pivotDelta.x,
                         pivotY: params.headPivotY + pivotDelta.y,
                         angle: totalAngle,
-                        skewX: tilt.skewX,
-                        scaleY: tilt.scaleY,
                         offX: pivotDelta.x + currentHeadX + pupilWorld.x,
                         offY: pivotDelta.y + currentHeadY + pupilWorld.y
                     };
