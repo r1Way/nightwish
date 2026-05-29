@@ -94,11 +94,23 @@ class DeskPet(QWidget):
 
         menu.addSeparator()
 
+        config_action = QAction("参数调节", self)
+        config_action.triggered.connect(self.toggle_config_panel)
+        menu.addAction(config_action)
+
+        menu.addSeparator()
+
         quit_action = QAction("退出程序", self)
         quit_action.triggered.connect(self.close)
         menu.addAction(quit_action)
 
         menu.exec(global_pos)
+
+    def toggle_config_panel(self):
+        self.webview.page().runJavaScript("""
+            const panel = document.getElementById('config-panel');
+            if (panel) panel.classList.toggle('hidden');
+        """)
 
     def resize_to_percent(self, pct):
         """按原始画布尺寸的百分比调整窗口大小"""
