@@ -133,6 +133,18 @@ class DeskPet(QWidget):
             (screen.height() - self.height()) // 2,
         )
 
+        # 全局鼠标追踪定时器 (~60fps)
+        self._mouse_timer = QTimer(self)
+        self._mouse_timer.timeout.connect(self._update_global_mouse)
+        self._mouse_timer.start(16)
+
+    def _update_global_mouse(self):
+        """将全局鼠标坐标传递给 JS"""
+        global_pos = QCursor.pos()
+        local_pos = self.webview.mapFromGlobal(global_pos)
+        js = f"window.onGlobalMouseMove && window.onGlobalMouseMove({local_pos.x()}, {local_pos.y()});"
+        self.webview.page().runJavaScript(js)
+
     # ========== 右键菜单 ==========
     def show_context_menu(self, global_pos):
         menu = QMenu(self)

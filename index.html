@@ -315,6 +315,12 @@
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
 
+        // 全局鼠标坐标（由 Python 通过 runJavaScript 传入，桌宠模式下生效）
+        window.onGlobalMouseMove = function(x, y) {
+            mouseX = x;
+            mouseY = y;
+        };
+
         let targetHeadX = 0, targetHeadY = 0;
         let currentHeadX = 0, currentHeadY = 0;
         let targetHeadAngle = 0, currentHeadAngle = 0;
@@ -335,7 +341,10 @@
             });
         }
 
-        document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+        // 非桌宠模式：用 document 鼠标事件；桌宠模式：由 Python 传入全局坐标
+        if (!IS_DESKPET) {
+            document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+        }
 
         // ========== 桌宠拖动支持 ==========
         if (IS_DESKPET) {
