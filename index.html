@@ -367,8 +367,10 @@
         let targetBodyAngle = 0, currentBodyAngle = 0;
         let targetEyeX = 0, targetEyeY = 0;
         let currentEyeX = 0, currentEyeY = 0;
-        let targetHandAngle = 0, currentHandAngle = 0;
-        let targetHandSkew = 0, currentHandSkew = 0;
+        let targetLeftHandAngle = 0, currentLeftHandAngle = 0;
+        let targetRightHandAngle = 0, currentRightHandAngle = 0;
+        let targetLeftHandSkew = 0, currentLeftHandSkew = 0;
+        let targetRightHandSkew = 0, currentRightHandSkew = 0;
 
         let images = {};
         let loadedCount = 0;
@@ -443,8 +445,11 @@
             targetBodyAngle = off.x * params.maxBodyAngle * D2R;
             targetEyeX = off.x * params.maxEyeMove;
             targetEyeY = off.y * params.maxEyeMove;
-            targetHandAngle = off.x * params.maxHandWiggleAngle * D2R;
-            targetHandSkew = off.y * params.maxHandWiggleSkew;
+            // 低头时(off.y>0)：左手向左展开(逆时针/负角度)，右手向右展开(顺时针/正角度)
+            targetLeftHandAngle = -off.y * params.maxHandWiggleAngle * D2R;
+            targetRightHandAngle = off.y * params.maxHandWiggleAngle * D2R;
+            targetLeftHandSkew = -off.y * params.maxHandWiggleSkew;
+            targetRightHandSkew = off.y * params.maxHandWiggleSkew;
         }
 
         function updateCurrent() {
@@ -454,8 +459,10 @@
             currentBodyAngle = lerp(currentBodyAngle, targetBodyAngle, params.lerpHead);
             currentEyeX = lerp(currentEyeX, targetEyeX, params.lerpEye);
             currentEyeY = lerp(currentEyeY, targetEyeY, params.lerpEye);
-            currentHandAngle = lerp(currentHandAngle, targetHandAngle, params.lerpHead);
-            currentHandSkew = lerp(currentHandSkew, targetHandSkew, params.lerpHead);
+            currentLeftHandAngle = lerp(currentLeftHandAngle, targetLeftHandAngle, params.lerpHead);
+            currentRightHandAngle = lerp(currentRightHandAngle, targetRightHandAngle, params.lerpHead);
+            currentLeftHandSkew = lerp(currentLeftHandSkew, targetLeftHandSkew, params.lerpHead);
+            currentRightHandSkew = lerp(currentRightHandSkew, targetRightHandSkew, params.lerpHead);
         }
 
         // 计算某点围绕身体旋转中心旋转后的位移
@@ -573,8 +580,9 @@
                 }
 
                 case 'hand': {
-                    // 左右手使用不同的连接处（肩膀位置）
-                    const localPivotX = name.includes('right') ? 760 : 600;
+                    // 左右手使用不同的连接处（肩膀位置）与不同的摆动方向
+                    const isRight = name.includes('right');
+                    const localPivotX = isRight ? 760 : 600;
                     const localPivotY = 380;
                     const localDX = localPivotX - params.bodyPivotX;
                     const localDY = localPivotY - params.bodyPivotY;
@@ -588,8 +596,8 @@
                         localDY,
                         localPivotX,
                         localPivotY,
-                        localAngle: currentHandAngle,
-                        localSkewX: currentHandSkew
+                        localAngle: isRight ? currentRightHandAngle : currentLeftHandAngle,
+                        localSkewX: isRight ? currentRightHandSkew : currentLeftHandSkew
                     };
                 }
 
