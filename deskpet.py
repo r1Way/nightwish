@@ -145,7 +145,7 @@ class DeskPet(QWidget):
             self._dragging = False
             self._drag_start_global = None
             self._window_start_pos = None
-        elif title == "DP:CONTEXT_MENU":
+        elif title.startswith("DP:CONTEXT_MENU"):
             self.show_context_menu(QCursor.pos())
 
     # ========== 键盘退出 ==========

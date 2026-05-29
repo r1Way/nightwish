@@ -442,8 +442,7 @@
             window.addEventListener('contextmenu', e => {
                 if (e.target.closest('#config-panel')) return;
                 e.preventDefault();
-                document.title = '';
-                document.title = 'DP:CONTEXT_MENU';
+                document.title = 'DP:CONTEXT_MENU_' + Date.now();
             });
         }
 
