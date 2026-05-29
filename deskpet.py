@@ -97,7 +97,7 @@ class DeskPet(QWidget):
         size_menu = QMenu("调节大小", self)
         for label, pct in [
             ("25%", 0.25), ("33%", 1/3), ("50%", 0.5),
-            ("75%", 0.75), ("100%", 1.0), ("150%", 1.5),
+            ("75%", 0.75), ("100%", 1.0), ("125%", 1.25), ("150%", 1.5),
         ]:
             action = QAction(label, self)
             action.triggered.connect(lambda checked, p=pct: self.resize_to_percent(p))
