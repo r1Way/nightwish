@@ -243,8 +243,8 @@
             maxHeadMove: 10,
             maxEyeMove: 5,
             maxPupilMove: 3,
-            maxHeadAngle: 6,
-            maxBodyAngle: 2,
+            maxHeadAngle: 10,
+            maxBodyAngle: 4,
             legBendFactor: 0.25,
             neckHeadInfluence: 0.85,
             headPivotX: 640,
@@ -392,8 +392,10 @@
             const off = getMouseOffset();
             targetHeadX = off.x * params.maxHeadMove;
             targetHeadY = off.y * params.maxHeadMove;
-            targetHeadAngle = off.x * params.maxHeadAngle * D2R;
-            targetBodyAngle = off.x * params.maxBodyAngle * D2R;
+            // 头部角度：主要响应垂直方向（抬头/低头），兼顾水平方向（左右转）
+            targetHeadAngle = (-off.y * 0.7 + off.x * 0.3) * params.maxHeadAngle * D2R;
+            // 身体角度：主要响应水平方向（左右转），兼顾垂直方向（前后倾）
+            targetBodyAngle = (off.x * 0.7 - off.y * 0.3) * params.maxBodyAngle * D2R;
             targetEyeX = off.x * params.maxEyeMove;
             targetEyeY = off.y * params.maxEyeMove;
         }
@@ -526,9 +528,16 @@
             }
         }
 
+        const GLOBAL_SCALE = IS_DESKPET ? 0.78 : 1.0;
+
         function draw() {
-            ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (!allLoaded) return;
+
+            ctx.save();
+            ctx.translate(CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+            ctx.scale(GLOBAL_SCALE, GLOBAL_SCALE);
+            ctx.translate(-CANVAS_SIZE / 2, -CANVAS_SIZE / 2);
 
             for (const cfg of layerConfigs) {
                 const img = images[cfg.name];
@@ -584,6 +593,8 @@
                 ctx.strokeRect(ir.x - pupilT.pivotX, ir.y - pupilT.pivotY, ir.w, ir.h);
                 ctx.restore();
             }
+
+            ctx.restore();
         }
 
         function animate() {
@@ -594,6 +605,8 @@
         }
 
         function resizeCanvas() {
+            canvas.width = CANVAS_SIZE;
+            canvas.height = CANVAS_SIZE;
             if (IS_DESKPET) {
                 canvas.style.width = window.innerWidth + 'px';
                 canvas.style.height = window.innerHeight + 'px';
