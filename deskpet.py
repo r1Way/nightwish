@@ -8,77 +8,12 @@ Live2D 桌宠 — 桌面悬浮窗程序
 import sys
 import os
 
-from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QMenu,
-    QSpinBox, QPushButton, QLabel, QHBoxLayout
-)
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QMenu
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtCore import Qt, QUrl, QPoint, QTimer
 from PySide6.QtGui import QCursor, QAction
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-class SizePanel(QWidget):
-    """调节窗口大小的浮动面板"""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("调节大小")
-        self.setWindowFlags(Qt.Tool | Qt.WindowStaysOnTopHint | Qt.WindowCloseButtonHint)
-        self.setFixedWidth(220)
-
-        layout = QVBoxLayout(self)
-        layout.setSpacing(10)
-        layout.setContentsMargins(15, 15, 15, 15)
-
-        # 宽度
-        w_layout = QHBoxLayout()
-        w_layout.addWidget(QLabel("宽度:"))
-        self.width_spin = QSpinBox()
-        self.width_spin.setRange(100, 2000)
-        self.width_spin.setValue(parent.width() if parent else 420)
-        self.width_spin.valueChanged.connect(self.on_value_changed)
-        w_layout.addWidget(self.width_spin)
-        layout.addLayout(w_layout)
-
-        # 高度
-        h_layout = QHBoxLayout()
-        h_layout.addWidget(QLabel("高度:"))
-        self.height_spin = QSpinBox()
-        self.height_spin.setRange(100, 2000)
-        self.height_spin.setValue(parent.height() if parent else 420)
-        self.height_spin.valueChanged.connect(self.on_value_changed)
-        h_layout.addWidget(self.height_spin)
-        layout.addLayout(h_layout)
-
-        # 按钮
-        btn_layout = QHBoxLayout()
-        close_btn = QPushButton("关闭")
-        close_btn.clicked.connect(self.close)
-        btn_layout.addStretch()
-        btn_layout.addWidget(close_btn)
-        layout.addLayout(btn_layout)
-
-        self._parent = parent
-
-    def showEvent(self, event):
-        """显示时同步当前窗口大小"""
-        if self._parent:
-            self.width_spin.blockSignals(True)
-            self.height_spin.blockSignals(True)
-            self.width_spin.setValue(self._parent.width())
-            self.height_spin.setValue(self._parent.height())
-            self.width_spin.blockSignals(False)
-            self.height_spin.blockSignals(False)
-            # 定位到主窗口右下方
-            pos = self._parent.pos() + QPoint(self._parent.width() + 10, 0)
-            self.move(pos)
-        super().showEvent(event)
-
-    def on_value_changed(self):
-        if self._parent:
-            self._parent.resize(self.width_spin.value(), self.height_spin.value())
 
 
 class DeskPet(QWidget):
@@ -122,9 +57,6 @@ class DeskPet(QWidget):
         self._timer.timeout.connect(self._on_drag_tick)
         self._timer.start(16)
 
-        # 调节大小面板
-        self._size_panel = SizePanel(self)
-
         # 初始大小和位置
         self.resize(420, 420)
         screen = QApplication.primaryScreen().geometry()
@@ -149,9 +81,16 @@ class DeskPet(QWidget):
     def show_context_menu(self, global_pos):
         menu = QMenu(self)
 
-        size_action = QAction("调节大小", self)
-        size_action.triggered.connect(self.toggle_size_panel)
-        menu.addAction(size_action)
+        # 调节大小子菜单（基于原始画布 1280×1280 的百分比）
+        size_menu = QMenu("调节大小", self)
+        for label, pct in [
+            ("25%", 0.25), ("33%", 1/3), ("50%", 0.5),
+            ("75%", 0.75), ("100%", 1.0), ("150%", 1.5),
+        ]:
+            action = QAction(label, self)
+            action.triggered.connect(lambda checked, p=pct: self.resize_to_percent(p))
+            size_menu.addAction(action)
+        menu.addMenu(size_menu)
 
         menu.addSeparator()
 
@@ -161,13 +100,11 @@ class DeskPet(QWidget):
 
         menu.exec(global_pos)
 
-    def toggle_size_panel(self):
-        if self._size_panel.isVisible():
-            self._size_panel.close()
-        else:
-            self._size_panel.show()
-            self._size_panel.raise_()
-            self._size_panel.activateWindow()
+    def resize_to_percent(self, pct):
+        """按原始画布尺寸的百分比调整窗口大小"""
+        base = 1280
+        size = int(base * pct)
+        self.resize(size, size)
 
     # ========== 拖动逻辑 ==========
     def _on_drag_tick(self):
