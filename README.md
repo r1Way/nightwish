@@ -4,6 +4,8 @@
 
 > 零外部依赖、纯前端实现、参数实时可调、支持桌面悬浮窗与浏览器双模式运行。
 
+🌐 **在线预览：** [https://r1way.github.io/nightwish/](https://r1way.github.io/nightwish/)
+
 ---
 
 ## ✨ 功能特性
@@ -36,11 +38,14 @@ python deskpet.py
 
 ### 方式二：浏览器模式
 
-直接用浏览器打开 `index.html`：
+直接用浏览器打开 `index.html`，或访问在线预览地址：
 
 ```bash
-# 无需任何依赖，双击即可
+# 本地打开
 index.html
+
+# 在线预览（GitHub Pages）
+# https://r1way.github.io/nightwish/
 ```
 
 - 鼠标移动即可预览全部动画效果
